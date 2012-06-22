@@ -1,0 +1,19 @@
+#IntelliJ IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+out
+gen-external-apklibs
+
+#Maven
+target
+release.properties
+pom.xml.*
+
+#OSX
+.DS_Store
+
+#Android generated
+bin
+gen

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	  <declare-styleable name="SlideExpandableListView">
+		  <attr name="mode">
+			  <flag name="single" value="0" />
+			  <flag name="multiple" value="1" />
+		  </attr>
+	  </declare-styleable>
+
+  </resources>
