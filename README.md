@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SlideExpandableListView for Android
 
 ![Screenshot](https://github.com/tjerkw/SlideExpandableListView/raw/example-screens.png)
@@ -127,3 +128,9 @@ If you have any contributions I am gladly to review them and use them if they ma
 ## License
 
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
+=======
+Android-SlideExpandableListView
+===============================
+
+A better ExpandableListView, with animated expandable views for each list item
+>>>>>>> c02efe155def29c610e07687aef7ac0e729cbfff
