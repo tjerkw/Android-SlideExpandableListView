@@ -10,7 +10,7 @@ Not happy with the Android ExpandableListView android offers? Want something lik
  * Animates by default
  * Easy to use
 
-Repository at <https://github.com/tjerkw/SlideExpandableListView>.
+Repository at <https://github.com/tjerkw/Android-SlideExpandableListView/>.
 
 ## Usage
 
@@ -38,15 +38,13 @@ it can be any subclass of View.
 ``` xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:slide="http://schemas.android.com/apk/res/com.tjerkw.slideexpandable.library"
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:orientation="vertical">
 	<RelativeLayout
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:id="@+id/item">
+			android:orientation="horizontal">
 
 		<TextView
 				android:layout_width="fill_parent"
@@ -54,6 +52,7 @@ it can be any subclass of View.
 				android:id="@+id/text"
 				android:text="Hello World"/>
 
+		<!-- this is the button that will trigger sliding of the expandable view -->
 		<Button
 				android:id="@+id/expandable_toggle_button"
 				android:text="More"
@@ -65,6 +64,7 @@ it can be any subclass of View.
 
 	</RelativeLayout>
 
+	<!-- this is the expandalbe view that is initially hidden and will slide out when the more button is pressed -->
 	<LinearLayout
 			android:layout_width="fill_parent"
 			android:layout_height="75dip"
@@ -72,28 +72,29 @@ it can be any subclass of View.
 			android:id="@+id/expandable"
 			android:background="#000000">
 
+		<!-- put whatever you want in the expandable view -->
 		<Button
-				android:id="@+id/shoot"
 				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" android:layout_weight="0.5"
-				android:text="Action A"
-				android:textSize="12dip"/>
+				android:layout_height="fill_parent"
+				android:layout_weight="0.5"
+				android:text="Action A" />
 
 		<Button
 				android:id="@+id/details"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:layout_weight="0.5"
-				android:text="Action B"
-				android:textSize="12dip"/>
+				android:text="Action B"/>
 
 	</LinearLayout>
 </LinearLayout>
 ```
 
-## Wrap your ListAdapter
+### Wrap your ListAdapter
 
-In order to provide the functionality you simply wrap your list adapter in a SlideExpandableListAdapter:
+In order to provide the functionality you simply wrap your list adapter in a SlideExpandableListAdapter.
+The adapter gets the ids to the more button, and the expandable view as parameters. This allows the adapter
+to find those views.
 
 ``` java
 		ListView list = ... your list view
@@ -110,6 +111,15 @@ In order to provide the functionality you simply wrap your list adapter in a Sli
 		);
 ```
 
+### Including In Your Project
+
+Currently you have to checkout the project, include it in your eclipse and ensure your project includes it.
+
+I am working on putting it in maven Central so it can be easily added to any maven Android project.
+
+A jar may also be an option, however i want to extend this library with android resources,
+which you cannot include as a jar file.
+
 ## Pull Requests
 
 If you have any contributions I am gladly to review them and use them if they make sense.
@@ -122,8 +132,7 @@ If you have any contributions I am gladly to review them and use them if they ma
 
 ## Acknowledgments
 
-* [TjerkWolterink] (http://about.me/tjerkw, https://github.com/tjerkw)
-
+* [TjerkWolterink] (http://about.me/tjerkw), about me (https://github.com/tjerkw), my linked in (http://www.linkedin.com/in/tjerkwolterink)
 
 ## License
 
