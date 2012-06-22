@@ -133,6 +133,7 @@ If you have any contributions I am gladly to review them and use them if they ma
 ## Acknowledgments
 
 * [TjerkWolterink] (http://about.me/tjerkw), about me (https://github.com/tjerkw), my linked in (http://www.linkedin.com/in/tjerkwolterink)
+* [Udinic] (https://github.com/Udinic/SmallExamples/tree/master/ExpandAnimationExample), his blog (http://udinic.wordpress.com/2011/09/03/expanding-listview-items/) contains the initial idea
 
 ## License
 
