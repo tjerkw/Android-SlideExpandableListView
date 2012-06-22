@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #IntelliJ IDEA
 .idea
 *.iml
@@ -18,10 +17,6 @@ pom.xml.*
 #Android generated
 bin
 gen
-=======
-# built application files
-*.apk
-*.ap_
 
 # files for the dex VM
 *.dex
@@ -35,4 +30,3 @@ gen/
 
 # Local configuration file (sdk path, etc)
 local.properties
->>>>>>> c02efe155def29c610e07687aef7ac0e729cbfff

@@ -1,7 +1,6 @@
-<<<<<<< HEAD
 # SlideExpandableListView for Android
 
-![Screenshot](https://github.com/tjerkw/SlideExpandableListView/raw/example-screens.png)
+![Screenshot](https://github.com/tjerkw/Android-SlideExpandableListView/blob/master/raw/example-screens.png)
 
 Not happy with the Android ExpandableListView android offers? Want something like the Spotify app. This library allows you to have custom listview in wich each list item has an area that will slide-out once the users clicks on a certain button.
 
@@ -128,9 +127,3 @@ If you have any contributions I am gladly to review them and use them if they ma
 ## License
 
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
-=======
-Android-SlideExpandableListView
-===============================
-
-A better ExpandableListView, with animated expandable views for each list item
->>>>>>> c02efe155def29c610e07687aef7ac0e729cbfff
