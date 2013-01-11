@@ -1,11 +1,9 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.content.Context;
 import android.util.AttributeSet;
-import android.view.View;
-import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.content.Context;
 
 /**
  * Simple subclass of listview which does nothing more than wrap
