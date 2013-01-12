@@ -45,10 +45,11 @@ public class ActionSlideExpandableListView extends SlideExpandableListView {
 		/**
 		 * Called when an action item is clicked.
 		 *
-		 * @param view the view clicked
+		 * @param itemView the view of the list item
+		 * @param clickedView the view clicked
 		 * @param position the position in the listview
 		 */
-		public void onClick(View view, int position);
+		public void onClick(View itemView, View clickedView, int position);
 	}
 
 	public void setAdapter(ListAdapter adapter) {
@@ -56,24 +57,24 @@ public class ActionSlideExpandableListView extends SlideExpandableListView {
 
 			@Override
 			public View getView(final int position, View view, ViewGroup viewGroup) {
-				view = wrapped.getView(position, view, viewGroup);
+				final View listView = wrapped.getView(position, view, viewGroup);
 				// add the action listeners
-				if(buttonIds != null && view!=null) {
+				if(buttonIds != null && listView!=null) {
 					for(int id : buttonIds) {
-						View buttonView = view.findViewById(id);
+						View buttonView = listView.findViewById(id);
 						if(buttonView!=null) {
 							buttonView.findViewById(id).setOnClickListener(new OnClickListener() {
 								@Override
 								public void onClick(View view) {
 									if(listener!=null) {
-										listener.onClick(view, position);
+										listener.onClick(listView, view, position);
 									}
 								}
 							});
 						}
 					}
 				}
-				return view;
+				return listView;
 			}
 		});
 	}

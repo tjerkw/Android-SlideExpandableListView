@@ -39,7 +39,7 @@ public class ExampleActivity extends Activity {
 		list.setItemActionListener(new ActionSlideExpandableListView.OnActionClickListener() {
 
 			@Override
-			public void onClick(View view, int position) {
+			public void onClick(View listView, View buttonview, int position) {
 
 				/**
 				 * Normally you would put a switch
@@ -48,7 +48,7 @@ public class ExampleActivity extends Activity {
 				 * different action.
 				 */
 				String actionName = "";
-				if(view.getId()==R.id.buttonA) {
+				if(buttonview.getId()==R.id.buttonA) {
 					actionName = "buttonA";
 				} else {
 					actionName = "ButtonB";

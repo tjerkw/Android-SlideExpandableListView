@@ -86,9 +86,12 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 
 	private void enableFor(View button, final View target, final int position) {
-		if(target == lastOpen) {
+		if(target == lastOpen && position!=lastOpenPosition) {
 			// lastOpen is recycled, so its reference is false
 			lastOpen = null;
+		}
+		if(position == lastOpenPosition) {
+			lastOpen = target;
 		}
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
