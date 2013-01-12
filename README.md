@@ -64,10 +64,10 @@ it can be any subclass of View.
 
 	</RelativeLayout>
 
-	<!-- this is the expandalbe view that is initially hidden and will slide out when the more button is pressed -->
+	<!-- this is the expandable view that is initially hidden and will slide out when the more button is pressed -->
 	<LinearLayout
 			android:layout_width="fill_parent"
-			android:layout_height="75dip"
+			android:layout_height="fill_parent"
 			android:orientation="horizontal"
 			android:id="@+id/expandable"
 			android:background="#000000">
@@ -111,6 +111,13 @@ to find those views.
 		);
 ```
 
+### Use the SlideExpandableListView or ActionSlideExpandableListView
+
+In order to simplify the usage of this library, you can also use the mentioned ListViews directly in your
+layout xml file. The view itself will make sure the ListAdapter is wrapped in a SlideExpandableListAdapter.
+
+See the sample app for usage information.
+
 ### Including In Your Project
 
 Currently you have to checkout the project, include it in your eclipse and ensure your project includes it.
@@ -126,7 +133,14 @@ If you have any contributions I am gladly to review them and use them if they ma
 
 ## Changelog
 
-### v1.0
+### v1.1.0
+
+* Added ActionSlideExpandableListView for easier event listening, see the sample app
+* Updated the sample app to also contain event handling logic (Solved issue #3)
+* Solved the issue with random views being expanded, due to recycling of views was not properly handled
+* Solved more issues #1 #2
+
+### v1.0.0
 
 * First release!
 
