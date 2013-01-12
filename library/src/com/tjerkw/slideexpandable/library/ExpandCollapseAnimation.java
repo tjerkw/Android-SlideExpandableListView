@@ -24,13 +24,11 @@ public class ExpandCollapseAnimation extends Animation {
 	/**
 	 * Initializes expand collapse animation, has two types, collapse (1) and expand (0).
 	 * @param view The view to animate
-	 * @param duration
 	 * @param type The type of animation: 0 will expand from gone and 0 size to visible and layout size defined in xml.
 	 * 1 will collapse view and set to gone
 	 */
-	public ExpandCollapseAnimation(View view, int duration, int type) {
+	public ExpandCollapseAnimation(View view, int type) {
 
-		setDuration(duration);
 		mAnimatedView = view;
 		mEndHeight = mAnimatedView.getHeight();
 		mLayoutParams = ((LinearLayout.LayoutParams) view.getLayoutParams());

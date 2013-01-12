@@ -23,10 +23,30 @@ import java.util.Set;
  * @date 6/9/12 4:41 PM
  */
 public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdapterImpl {
+	/**
+	 * Reference to the last expanded list item.
+	 * Since lists are recycled this might be null if
+	 * though there is an expanded list item
+	 */
 	private View lastOpen = null;
+	/**
+	 * The position of the last expanded list item.
+	 * If -1 there is no list item expanded.
+	 * Otherwise it points to the position of the last expanded list item
+	 */
 	private int lastOpenPosition = -1;
-	private Set<Integer> openItems = new HashSet<Integer>(10);
-	private Map<Integer, Integer> viewHeights = new HashMap<Integer, Integer>(10);
+	/**
+	 * A list of positions of all list items that are expanded.
+	 * Normally only one is expanded. But a mode to expand
+	 * multiple will be added soon.
+	 */
+	private final Set<Integer> openItems = new HashSet<Integer>(3);
+	/**
+	 * We remember, for each collapsable view its height.
+	 * So we dont need to recalculate.
+	 * The height is calculated just before the view is drawn.
+	 */
+	private final Map<Integer, Integer> viewHeights = new HashMap<Integer, Integer>(10);
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
@@ -53,6 +73,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 *
 	 * @see getExpandableView
 	 * @param parent the list view item
+	 * @ensure return!=null
 	 * @return a child of parent which is a button
 	 */
 	public abstract Button getExpandToggleButton(View parent);
@@ -69,6 +90,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 *
 	 * @see getExpandToggleButton
 	 * @param parent the list view item
+	 * @ensure return!=null
 	 * @return a child of parent which is a view (or often ViewGroup)
 	 *  that can be collapsed and expanded
 	 */
@@ -91,12 +113,14 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	}
 
 
-	private void enableFor(View button, final View target, final int position) {
+	private void enableFor(final View button, final View target, final int position) {
 		if(target == lastOpen && position!=lastOpenPosition) {
 			// lastOpen is recycled, so its reference is false
 			lastOpen = null;
 		}
 		if(position == lastOpenPosition) {
+			// re reference to the last view
+			// so when can animate it when collapsed
 			lastOpen = target;
 		}
 		if(viewHeights.get(position)==null) {
@@ -124,27 +148,23 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			@Override
 			public void onClick(View view) {
 				view.setAnimation(null);
-				int type = target.getVisibility() == View.VISIBLE ? ExpandCollapseAnimation.COLLAPSE : ExpandCollapseAnimation.EXPAND;
-				Animation anim = new ExpandCollapseAnimation(
-					target,
-					getAnimationDuration(),
-					type
-				);
+				// check wether we need to expand or collapse
+				int type =
+					target.getVisibility() == View.VISIBLE
+					? ExpandCollapseAnimation.COLLAPSE
+					: ExpandCollapseAnimation.EXPAND;
+
+				// remember the state
 				if(type == ExpandCollapseAnimation.EXPAND) {
 					openItems.add(position);
 				} else {
 					openItems.remove(position);
 				}
+				// check if we need to collapse a different view
 				if(type == ExpandCollapseAnimation.EXPAND) {
 					if(lastOpenPosition != -1 && lastOpenPosition != position) {
 						if(lastOpen!=null) {
-							lastOpen.startAnimation(
-								new ExpandCollapseAnimation(
-									lastOpen,
-									getAnimationDuration(),
-									ExpandCollapseAnimation.COLLAPSE
-								)
-							);
+							animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
 						}
 						openItems.remove(lastOpenPosition);
 					}
@@ -153,7 +173,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				} else if(lastOpenPosition == position) {
 					lastOpenPosition = -1;
 				}
-				view.startAnimation(anim);
+
+				animateView(target, type);
 			}
 		});
 	}
@@ -170,4 +191,18 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		}
 	}
 
+	/**
+	 * Performs eithe COLLAPSE or EXPAND animation on the target view
+	 * @param target the view to animate
+	 * @param type the animation type, either ExpandCollapseAnimation.COLLAPSE
+	 *             or ExpandCollapseAnimation.EXPAND
+	 */
+	private void animateView(final View target, final int type) {
+		Animation anim = new ExpandCollapseAnimation(
+				target,
+				type
+		);
+		anim.setDuration(getAnimationDuration());
+		target.startAnimation(anim);
+	}
 }
