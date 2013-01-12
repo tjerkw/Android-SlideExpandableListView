@@ -1,12 +1,17 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -20,7 +25,8 @@ import java.util.Set;
 public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdapterImpl {
 	private View lastOpen = null;
 	private int lastOpenPosition = -1;
-	private Set<Integer> openItems = new HashSet<Integer>();
+	private Set<Integer> openItems = new HashSet<Integer>(10);
+	private Map<Integer, Integer> viewHeights = new HashMap<Integer, Integer>(10);
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
@@ -93,6 +99,27 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		if(position == lastOpenPosition) {
 			lastOpen = target;
 		}
+		if(viewHeights.get(position)==null) {
+
+			// just before drawing we know that the measurement
+			// was done correctly, so at this point we remember the height
+			// of the target view, so we know it when animating
+			target.getViewTreeObserver().addOnPreDrawListener(
+				new ViewTreeObserver.OnPreDrawListener() {
+					@Override
+					public boolean onPreDraw() {
+						target.getViewTreeObserver().removeOnPreDrawListener(this);
+						Log.d("AbstractSlideExpandable", "gotHeight: " + target.getHeight());
+						viewHeights.put(position, target.getHeight());
+						updateExpandable(target, position);
+						return false;
+					}
+				}
+			);
+		} else {
+			updateExpandable(target, position);
+		}
+
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
@@ -129,8 +156,18 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				view.startAnimation(anim);
 			}
 		});
-		// apply the remembered the collapse state
-		target.setVisibility(openItems.contains(position) ? View.VISIBLE : View.GONE);
+	}
+
+	private void updateExpandable(View target, int position) {
+
+		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)target.getLayoutParams();
+		if(openItems.contains(position)) {
+			target.setVisibility(View.VISIBLE);
+			params.bottomMargin = 0;
+		} else {
+			target.setVisibility(View.GONE);
+			params.bottomMargin = 0-viewHeights.get(position);
+		}
 	}
 
 }
