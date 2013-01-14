@@ -58,6 +58,19 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		return view;
 	}
 
+	protected void collapseExpandableView(View parent) {
+		View expandableView = getExpandableView(parent);
+		expandableView.setVisibility(View.GONE);
+		resetState();
+	}
+
+	private void resetState() {
+		lastOpen = null;
+		lastOpenPosition = -1;
+		openItems.clear();
+		viewHeights.clear();
+	}
+
 	/**
 	 * This method is used to get the Button view that should
 	 * expand or collapse the Expandable View.
