@@ -1,6 +1,7 @@
 package com.tjerkw.slideexpandable.library;
 
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -9,9 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,7 +45,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * So we dont need to recalculate.
 	 * The height is calculated just before the view is drawn.
 	 */
-	private final Map<Integer, Integer> viewHeights = new HashMap<Integer, Integer>(10);
+	private final SparseIntArray viewHeights = new SparseIntArray(10);
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
@@ -123,7 +122,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			// so when can animate it when collapsed
 			lastOpen = target;
 		}
-		if(viewHeights.get(position)==null) {
+		int height = viewHeights.get(position, -1);
+		if(height == -1) {
 
 			// just before drawing we know that the measurement
 			// was done correctly, so at this point we remember the height
