@@ -1,11 +1,18 @@
 package com.tjerkw.slideexpandable.library;
 
-import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Wraps a ListAdapter to give it expandable list view functionality.
@@ -15,76 +22,42 @@ import android.widget.ListAdapter;
  * @author tjerk
  * @date 6/9/12 4:41 PM
  */
-public abstract class AbstractSlideExpandableListAdapter implements ListAdapter {
-	private ListAdapter wrapped;
+public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdapterImpl {
+	/**
+	 * Reference to the last expanded list item.
+	 * Since lists are recycled this might be null if
+	 * though there is an expanded list item
+	 */
+	private View lastOpen = null;
+	/**
+	 * The position of the last expanded list item.
+	 * If -1 there is no list item expanded.
+	 * Otherwise it points to the position of the last expanded list item
+	 */
+	private int lastOpenPosition = -1;
+	/**
+	 * A list of positions of all list items that are expanded.
+	 * Normally only one is expanded. But a mode to expand
+	 * multiple will be added soon.
+	 */
+	private final Set<Integer> openItems = new HashSet<Integer>(3);
+	/**
+	 * We remember, for each collapsable view its height.
+	 * So we dont need to recalculate.
+	 * The height is calculated just before the view is drawn.
+	 */
+	private final Map<Integer, Integer> viewHeights = new HashMap<Integer, Integer>(10);
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	@Override
-	public boolean areAllItemsEnabled() {
-		return wrapped.areAllItemsEnabled();
-	}
-
-	@Override
-	public boolean isEnabled(int i) {
-		return wrapped.isEnabled(i);
-	}
-
-	@Override
-	public void registerDataSetObserver(DataSetObserver dataSetObserver) {
-		wrapped.registerDataSetObserver(dataSetObserver);
-	}
-
-	@Override
-	public void unregisterDataSetObserver(DataSetObserver dataSetObserver) {
-		wrapped.unregisterDataSetObserver(dataSetObserver);
-	}
-
-	@Override
-	public int getCount() {
-		return wrapped.getCount();
-	}
-
-	@Override
-	public Object getItem(int i) {
-		return wrapped.getItem(i);
-	}
-
-	@Override
-	public long getItemId(int i) {
-		return wrapped.getItemId(i);
-	}
-
-	@Override
-	public boolean hasStableIds() {
-		return wrapped.hasStableIds();
-	}
-
-	@Override
-	public View getView(int i, View view, ViewGroup viewGroup) {
-		view = wrapped.getView(i, view, viewGroup);
-		enableFor(view);
+	public View getView(int position, View view, ViewGroup viewGroup) {
+		view = wrapped.getView(position, view, viewGroup);
+		enableFor(view, position);
 		return view;
 	}
-
-	@Override
-	public int getItemViewType(int i) {
-		return wrapped.getItemViewType(i);
-	}
-
-	@Override
-	public int getViewTypeCount() {
-		return wrapped.getViewTypeCount();
-	}
-
-	@Override
-	public boolean isEmpty() {
-		return wrapped.isEmpty();
-	}
-
-	private static View lastOpen = null;
 
 	/**
 	 * This method is used to get the Button view that should
@@ -100,6 +73,7 @@ public abstract class AbstractSlideExpandableListAdapter implements ListAdapter 
 	 *
 	 * @see getExpandableView
 	 * @param parent the list view item
+	 * @ensure return!=null
 	 * @return a child of parent which is a button
 	 */
 	public abstract Button getExpandToggleButton(View parent);
@@ -116,37 +90,119 @@ public abstract class AbstractSlideExpandableListAdapter implements ListAdapter 
 	 *
 	 * @see getExpandToggleButton
 	 * @param parent the list view item
+	 * @ensure return!=null
 	 * @return a child of parent which is a view (or often ViewGroup)
 	 *  that can be collapsed and expanded
 	 */
 	public abstract View getExpandableView(View parent);
 
-	public void enableFor(View parent) {
-		Button more = getExpandToggleButton(parent);
-		View itemToolbar = getExpandableView(parent);
-		enableFor(more, itemToolbar);
+	/**
+	 * Gets the duration of the collapse animation in ms.
+	 * Default is 330ms. Override this method to change the default.
+	 *
+	 * @return the duration of the anim in ms
+	 */
+	protected int getAnimationDuration() {
+		return 330;
 	}
 
-	public static void enableFor(View button, final View target) {
+	public void enableFor(View parent, int position) {
+		Button more = getExpandToggleButton(parent);
+		View itemToolbar = getExpandableView(parent);
+		enableFor(more, itemToolbar, position);
+	}
+
+
+	private void enableFor(final View button, final View target, final int position) {
+		if(target == lastOpen && position!=lastOpenPosition) {
+			// lastOpen is recycled, so its reference is false
+			lastOpen = null;
+		}
+		if(position == lastOpenPosition) {
+			// re reference to the last view
+			// so when can animate it when collapsed
+			lastOpen = target;
+		}
+		if(viewHeights.get(position)==null) {
+
+			// just before drawing we know that the measurement
+			// was done correctly, so at this point we remember the height
+			// of the target view, so we know it when animating
+			target.getViewTreeObserver().addOnPreDrawListener(
+				new ViewTreeObserver.OnPreDrawListener() {
+					@Override
+					public boolean onPreDraw() {
+						target.getViewTreeObserver().removeOnPreDrawListener(this);
+						Log.d("AbstractSlideExpandable", "gotHeight: " + target.getHeight());
+						viewHeights.put(position, target.getHeight());
+						updateExpandable(target, position);
+						return false;
+					}
+				}
+			);
+		} else {
+			updateExpandable(target, position);
+		}
+
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				view.setAnimation(null);
-				int type = target.getVisibility() == View.VISIBLE ? ExpandCollapseAnimation.COLLAPSE : ExpandCollapseAnimation.EXPAND;
-				Animation anim = new ExpandCollapseAnimation(target, 330, type);
+				// check wether we need to expand or collapse
+				int type =
+					target.getVisibility() == View.VISIBLE
+					? ExpandCollapseAnimation.COLLAPSE
+					: ExpandCollapseAnimation.EXPAND;
+
+				// remember the state
 				if(type == ExpandCollapseAnimation.EXPAND) {
-					if(lastOpen != null && lastOpen != target && lastOpen.getVisibility() == View.VISIBLE) {
-						lastOpen.startAnimation(new ExpandCollapseAnimation(lastOpen, 330, ExpandCollapseAnimation.COLLAPSE));
+					openItems.add(position);
+				} else {
+					openItems.remove(position);
+				}
+				// check if we need to collapse a different view
+				if(type == ExpandCollapseAnimation.EXPAND) {
+					if(lastOpenPosition != -1 && lastOpenPosition != position) {
+						if(lastOpen!=null) {
+							animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+						}
+						openItems.remove(lastOpenPosition);
 					}
 					lastOpen = target;
-				} else if(lastOpen == view) {
-					lastOpen = null;
+					lastOpenPosition = position;
+				} else if(lastOpenPosition == position) {
+					lastOpenPosition = -1;
 				}
-				view.startAnimation(anim);
+
+				animateView(target, type);
 			}
 		});
-		// ensure the target is currently not visible
-		target.setVisibility(View.GONE);
 	}
 
+	private void updateExpandable(View target, int position) {
+
+		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)target.getLayoutParams();
+		if(openItems.contains(position)) {
+			target.setVisibility(View.VISIBLE);
+			params.bottomMargin = 0;
+		} else {
+			target.setVisibility(View.GONE);
+			params.bottomMargin = 0-viewHeights.get(position);
+		}
+	}
+
+	/**
+	 * Performs eithe COLLAPSE or EXPAND animation on the target view
+	 * @param target the view to animate
+	 * @param type the animation type, either ExpandCollapseAnimation.COLLAPSE
+	 *             or ExpandCollapseAnimation.EXPAND
+	 */
+	private void animateView(final View target, final int type) {
+		Animation anim = new ExpandCollapseAnimation(
+				target,
+				type
+		);
+		anim.setDuration(getAnimationDuration());
+		target.startAnimation(anim);
+	}
 }

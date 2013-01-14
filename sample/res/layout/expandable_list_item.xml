@@ -14,7 +14,7 @@
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:id="@+id/text"
-				android:text="Hello World"/>
+				android:text="Hello World" android:textSize="40dp"/>
 
 		<Button
 				android:id="@+id/expandable_toggle_button"
@@ -23,26 +23,26 @@
 				android:layout_height="wrap_content"
 				android:layout_alignBottom="@+id/text"
 				android:layout_alignParentRight="true"
-				android:layout_alignTop="@id/text"/>
+				android:layout_alignTop="@id/text" android:textSize="30dp"/>
 
 	</RelativeLayout>
 
 	<LinearLayout
 			android:layout_width="fill_parent"
-			android:layout_height="75dip"
+			android:layout_height="wrap_content"
 			android:orientation="horizontal"
 			android:id="@+id/expandable"
 			android:background="#000000">
 
 		<Button
-				android:id="@+id/shoot"
+				android:id="@+id/buttonA"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent" android:layout_weight="0.5"
 				android:text="Action A"
 				android:textSize="12dip"/>
 
 		<Button
-				android:id="@+id/details"
+				android:id="@+id/buttonB"
 				android:layout_width="fill_parent"
 				android:layout_height="fill_parent"
 				android:layout_weight="0.5"
