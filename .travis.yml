@@ -8,5 +8,5 @@ before_install:
   - export ANDROID_HOME=~/build/tjerkw/Android-SlideExpandableListView/android-sdk-linux
   - export PATH=${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
   - android list sdk
-  - android update sdk --no-ui --obsolete --force
+  - android update sdk --filter 1,2,14 --no-ui --obsolete --force
 #  - android update sdk --filter 1,2,5,9 --no-ui --force
