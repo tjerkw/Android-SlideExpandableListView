@@ -152,3 +152,5 @@ If you have any contributions I am gladly to review them and use them if they ma
 ## License
 
 Licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0.html)
+
+[![githalytics.com alpha](https://cruel-carlota.pagodabox.com/789c42a6ae45661a79e6e2695942ef65 "githalytics.com")](http://githalytics.com/tjerkw/Android-SlideExpandableListView)
