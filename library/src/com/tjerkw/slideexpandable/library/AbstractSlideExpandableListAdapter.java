@@ -64,18 +64,18 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * <br/>
 	 * Normally it will be implemented as:
 	 * <pre>
-	 * return (Button)parent.findViewById(R.id.expand_toggle_button)
+	 * return parent.findViewById(R.id.expand_toggle_button)
 	 * </pre>
 	 *
 	 * A listener will be attached to the button which will
 	 * either expand or collapse the expandable view
 	 *
-	 * @see getExpandableView
+	 * @see #getExpandableView(View)
 	 * @param parent the list view item
 	 * @ensure return!=null
 	 * @return a child of parent which is a button
 	 */
-	public abstract Button getExpandToggleButton(View parent);
+	public abstract View getExpandToggleButton(View parent);
 
 	/**
 	 * This method is used to get the view that will be hidden
@@ -87,7 +87,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * return parent.findViewById(R.id.expandable)
 	 * </pre>
 	 *
-	 * @see getExpandToggleButton
+	 * @see #getExpandToggleButton(View)
 	 * @param parent the list view item
 	 * @ensure return!=null
 	 * @return a child of parent which is a view (or often ViewGroup)
@@ -106,7 +106,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	}
 
 	public void enableFor(View parent, int position) {
-		Button more = getExpandToggleButton(parent);
+		View more = getExpandToggleButton(parent);
 		View itemToolbar = getExpandableView(parent);
 		enableFor(more, itemToolbar, position);
 	}

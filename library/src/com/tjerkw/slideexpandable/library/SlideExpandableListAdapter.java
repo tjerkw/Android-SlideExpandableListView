@@ -27,14 +27,8 @@ public class SlideExpandableListAdapter extends AbstractSlideExpandableListAdapt
 	}
 
 	@Override
-	public Button getExpandToggleButton(View parent) {
-		View view = parent.findViewById(toggle_button_id);
-		if (!(view instanceof Button)) {
-			throw new IllegalArgumentException(
-				"Could not cast view with id "+toggle_button_id+" to a Button, but it must be a button"
-			);
-		}
-		return (Button)view;
+	public View getExpandToggleButton(View parent) {
+		return parent.findViewById(toggle_button_id);
 	}
 
 	@Override
