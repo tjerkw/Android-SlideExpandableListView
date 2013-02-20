@@ -30,7 +30,7 @@ public class ExpandCollapseAnimation extends Animation {
 	public ExpandCollapseAnimation(View view, int type) {
 
 		mAnimatedView = view;
-		mEndHeight = mAnimatedView.getHeight();
+		mEndHeight = mAnimatedView.getMeasuredHeight();
 		mLayoutParams = ((LinearLayout.LayoutParams) view.getLayoutParams());
 		mType = type;
 		if(mType == EXPAND) {
