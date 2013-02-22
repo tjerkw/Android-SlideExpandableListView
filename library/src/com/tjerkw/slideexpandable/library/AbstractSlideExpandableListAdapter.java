@@ -1,12 +1,9 @@
 package com.tjerkw.slideexpandable.library;
 
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.view.animation.Animation;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 
@@ -108,6 +105,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	public void enableFor(View parent, int position) {
 		View more = getExpandToggleButton(parent);
 		View itemToolbar = getExpandableView(parent);
+		itemToolbar.measure(parent.getWidth(), parent.getHeight());
+		
 		enableFor(more, itemToolbar, position);
 	}
 
@@ -124,22 +123,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		}
 		int height = viewHeights.get(position, -1);
 		if(height == -1) {
-
-			// just before drawing we know that the measurement
-			// was done correctly, so at this point we remember the height
-			// of the target view, so we know it when animating
-			target.getViewTreeObserver().addOnPreDrawListener(
-				new ViewTreeObserver.OnPreDrawListener() {
-					@Override
-					public boolean onPreDraw() {
-						target.getViewTreeObserver().removeOnPreDrawListener(this);
-						Log.d("AbstractSlideExpandable", "gotHeight: " + target.getHeight());
-						viewHeights.put(position, target.getHeight());
-						updateExpandable(target, position);
-						return false;
-					}
-				}
-			);
+			viewHeights.put(position, target.getMeasuredHeight());
+			updateExpandable(target,position);
 		} else {
 			updateExpandable(target, position);
 		}
