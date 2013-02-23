@@ -177,7 +177,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	}
 
 	/**
-	 * Performs eithe COLLAPSE or EXPAND animation on the target view
+	 * Performs either COLLAPSE or EXPAND animation on the target view
 	 * @param target the view to animate
 	 * @param type the animation type, either ExpandCollapseAnimation.COLLAPSE
 	 *             or ExpandCollapseAnimation.EXPAND
@@ -189,5 +189,16 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		);
 		anim.setDuration(getAnimationDuration());
 		target.startAnimation(anim);
+	}
+	
+
+	/**
+	 * closes the current open item with an animation
+	 */
+	public void animateCollapse() {
+		if(lastOpen != null){
+			animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+			lastOpenPosition = -1;
+		}
 	}
 }
