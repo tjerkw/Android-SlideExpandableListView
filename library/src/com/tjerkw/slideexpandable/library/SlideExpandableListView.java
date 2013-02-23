@@ -25,6 +25,10 @@ class SlideExpandableListView extends ListView {
 		super(context, attrs, defStyle);
 	}
 
+	public void collapse() {
+		final SlideExpandableListAdapter adapter = (SlideExpandableListAdapter) getAdapter();
+		adapter.animateCollapse();
+	}
 
 	public void setAdapter(ListAdapter adapter) {
 		super.setAdapter(new SlideExpandableListAdapter(adapter));
