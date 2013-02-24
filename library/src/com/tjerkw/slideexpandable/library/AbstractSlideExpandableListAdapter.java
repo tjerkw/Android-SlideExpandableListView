@@ -106,7 +106,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		View more = getExpandToggleButton(parent);
 		View itemToolbar = getExpandableView(parent);
 		itemToolbar.measure(parent.getWidth(), parent.getHeight());
-		
+
 		enableFor(more, itemToolbar, position);
 	}
 
@@ -180,7 +180,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * Performs either COLLAPSE or EXPAND animation on the target view
 	 * @param target the view to animate
 	 * @param type the animation type, either ExpandCollapseAnimation.COLLAPSE
-	 *             or ExpandCollapseAnimation.EXPAND
+	 *			 or ExpandCollapseAnimation.EXPAND
 	 */
 	private void animateView(final View target, final int type) {
 		Animation anim = new ExpandCollapseAnimation(
@@ -190,15 +190,24 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		anim.setDuration(getAnimationDuration());
 		target.startAnimation(anim);
 	}
-	
+
 
 	/**
-	 * closes the current open item with an animation
+	 * Closes the current open item.
+	 * If it is current visible it will be closed with an animation.
+	 *
+	 * @return true if an item was closed, false otherwise
 	 */
-	public void animateCollapse() {
-		if(lastOpen != null){
-			animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+	public boolean collapseLastOpen() {
+		if(lastOpenPosition != -1) {
+			// if visible animate it out
+			if(lastOpen != null) {
+				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+			}
+			openItems.remove(lastOpenPosition);
 			lastOpenPosition = -1;
+			return true;
 		}
+		return false;
 	}
 }

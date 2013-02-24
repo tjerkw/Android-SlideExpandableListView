@@ -12,6 +12,7 @@ import android.content.Context;
  * any ListAdapter in a SlideExpandalbeListAdapter
  */
 class SlideExpandableListView extends ListView {
+    private SlideExpandableListAdapter adapter;
 
 	public SlideExpandableListView(Context context) {
 		super(context);
@@ -25,13 +26,21 @@ class SlideExpandableListView extends ListView {
 		super(context, attrs, defStyle);
 	}
 
-	public void collapse() {
-		final SlideExpandableListAdapter adapter = (SlideExpandableListAdapter) getAdapter();
-		adapter.animateCollapse();
+	/**
+	 * Collapses the currently open view.
+	 *
+	 * @return true if a view was collapsed, false if there was no open view.
+	 */
+	public boolean collapse() {
+		if(adapter!=null) {
+			return adapter.collapseLastOpen();
+		}
+		return false;
 	}
 
 	public void setAdapter(ListAdapter adapter) {
-		super.setAdapter(new SlideExpandableListAdapter(adapter));
+		this.adapter = new SlideExpandableListAdapter(adapter);
+		super.setAdapter(this.adapter);
 	}
 
 	/**
