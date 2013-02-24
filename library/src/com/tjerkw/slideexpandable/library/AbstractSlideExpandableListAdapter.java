@@ -199,6 +199,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		if(lastOpen != null){
 			animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
 			lastOpenPosition = -1;
+			viewHeights.clear();
+			openItems.clear();
 		}
 	}
 }
