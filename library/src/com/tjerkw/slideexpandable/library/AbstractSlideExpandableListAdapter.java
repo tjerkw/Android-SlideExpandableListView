@@ -1,5 +1,7 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,8 +9,7 @@ import android.view.animation.Animation;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.BitSet;
 
 /**
  * Wraps a ListAdapter to give it expandable list view functionality.
@@ -35,8 +36,10 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * A list of positions of all list items that are expanded.
 	 * Normally only one is expanded. But a mode to expand
 	 * multiple will be added soon.
+	 *
+	 * If an item onj position x is open, its bit is set
 	 */
-	private final Set<Integer> openItems = new HashSet<Integer>(3);
+	private BitSet openItems = new BitSet();
 	/**
 	 * We remember, for each collapsable view its height.
 	 * So we dont need to recalculate.
@@ -141,9 +144,9 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 				// remember the state
 				if(type == ExpandCollapseAnimation.EXPAND) {
-					openItems.add(position);
+					openItems.set(position, true);
 				} else {
-					openItems.remove(position);
+					openItems.set(position, false);
 				}
 				// check if we need to collapse a different view
 				if(type == ExpandCollapseAnimation.EXPAND) {
@@ -151,7 +154,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						if(lastOpen!=null) {
 							animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
 						}
-						openItems.remove(lastOpenPosition);
+						openItems.set(lastOpenPosition, false);
 					}
 					lastOpen = target;
 					lastOpenPosition = position;
@@ -167,7 +170,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	private void updateExpandable(View target, int position) {
 
 		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams)target.getLayoutParams();
-		if(openItems.contains(position)) {
+		if(openItems.get(position)) {
 			target.setVisibility(View.VISIBLE);
 			params.bottomMargin = 0;
 		} else {
@@ -204,10 +207,84 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			if(lastOpen != null) {
 				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
 			}
-			openItems.remove(lastOpenPosition);
+			openItems.set(lastOpenPosition, false);
 			lastOpenPosition = -1;
 			return true;
 		}
 		return false;
+	}
+
+	public Parcelable onSaveInstanceState(Parcelable parcelable) {
+
+		SavedState ss = new SavedState(parcelable);
+		ss.lastOpenPosition = this.lastOpenPosition;
+		ss.openItems = this.openItems;
+		return ss;
+	}
+
+	public void onRestoreInstanceState(SavedState state) {
+
+		this.lastOpenPosition = state.lastOpenPosition;
+		this.openItems = state.openItems;
+	}
+
+	/**
+	 * Utility methods to read and write a bitset from and to a Parcel
+	 */
+	private static BitSet readBitSet(Parcel src) {
+		int cardinality = src.readInt();
+
+		BitSet set = new BitSet();
+		for (int i = 0; i < cardinality; i++) {
+			set.set(src.readInt());
+		}
+
+		return set;
+	}
+
+	private static void writeBitSet(Parcel dest, BitSet set) {
+		int nextSetBit = -1;
+
+		dest.writeInt(set.cardinality());
+
+		while ((nextSetBit = set.nextSetBit(nextSetBit + 1)) != -1) {
+			dest.writeInt(nextSetBit);
+		}
+	}
+
+	/**
+	 * The actual state class
+	 */
+	static class SavedState extends View.BaseSavedState {
+		public BitSet openItems = null;
+		public int lastOpenPosition = -1;
+
+		SavedState(Parcelable superState) {
+			super(superState);
+		}
+
+		private SavedState(Parcel in) {
+			super(in);
+			in.writeInt(lastOpenPosition);
+			writeBitSet(in, openItems);
+		}
+
+		@Override
+		public void writeToParcel(Parcel out, int flags) {
+			super.writeToParcel(out, flags);
+			lastOpenPosition = out.readInt();
+			 openItems = readBitSet(out);
+		}
+
+		//required field that makes Parcelables from a Parcel
+		public static final Parcelable.Creator<SavedState> CREATOR =
+		new Parcelable.Creator<SavedState>() {
+			public SavedState createFromParcel(Parcel in) {
+				return new SavedState(in);
+			}
+			public SavedState[] newArray(int size) {
+				return new SavedState[size];
+			}
+		};
 	}
 }

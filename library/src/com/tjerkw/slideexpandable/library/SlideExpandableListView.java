@@ -1,5 +1,6 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
@@ -12,7 +13,7 @@ import android.content.Context;
  * any ListAdapter in a SlideExpandalbeListAdapter
  */
 class SlideExpandableListView extends ListView {
-    private SlideExpandableListAdapter adapter;
+	private SlideExpandableListAdapter adapter;
 
 	public SlideExpandableListView(Context context) {
 		super(context);
@@ -61,4 +62,22 @@ class SlideExpandableListView extends ListView {
 		});
 	}
 
+
+	@Override
+	public Parcelable onSaveInstanceState() {
+		return adapter.onSaveInstanceState(super.onSaveInstanceState());
+	}
+
+	@Override
+	public void onRestoreInstanceState(Parcelable state) {
+		if(!(state instanceof AbstractSlideExpandableListAdapter.SavedState)) {
+			super.onRestoreInstanceState(state);
+			return;
+		}
+
+		AbstractSlideExpandableListAdapter.SavedState ss = (AbstractSlideExpandableListAdapter.SavedState)state;
+		super.onRestoreInstanceState(ss.getSuperState());
+
+		adapter.onRestoreInstanceState(ss);
+	}
 }
