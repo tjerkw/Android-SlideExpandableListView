@@ -134,35 +134,56 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View view) {
-				view.setAnimation(null);
-				// check wether we need to expand or collapse
-				int type =
-					target.getVisibility() == View.VISIBLE
-					? ExpandCollapseAnimation.COLLAPSE
-					: ExpandCollapseAnimation.EXPAND;
+			public void onClick(final View view) {
 
-				// remember the state
-				if(type == ExpandCollapseAnimation.EXPAND) {
-					openItems.set(position, true);
-				} else {
-					openItems.set(position, false);
-				}
-				// check if we need to collapse a different view
-				if(type == ExpandCollapseAnimation.EXPAND) {
-					if(lastOpenPosition != -1 && lastOpenPosition != position) {
-						if(lastOpen!=null) {
-							animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+				Animation a = target.getAnimation();
+
+				if (a != null && a.hasStarted() && !a.hasEnded()) {
+
+					a.setAnimationListener(new Animation.AnimationListener() {
+						@Override
+						public void onAnimationStart(Animation animation) {
 						}
-						openItems.set(lastOpenPosition, false);
-					}
-					lastOpen = target;
-					lastOpenPosition = position;
-				} else if(lastOpenPosition == position) {
-					lastOpenPosition = -1;
-				}
 
-				animateView(target, type);
+						@Override
+						public void onAnimationEnd(Animation animation) {
+							view.performClick();
+						}
+
+						@Override
+						public void onAnimationRepeat(Animation animation) {
+						}
+					});
+
+				} else {
+
+					target.setAnimation(null);
+
+					int type = target.getVisibility() == View.VISIBLE
+							? ExpandCollapseAnimation.COLLAPSE
+							: ExpandCollapseAnimation.EXPAND;
+
+					// remember the state
+					if (type == ExpandCollapseAnimation.EXPAND) {
+						openItems.set(position, true);
+					} else {
+						openItems.set(position, false);
+					}
+					// check if we need to collapse a different view
+					if (type == ExpandCollapseAnimation.EXPAND) {
+						if (lastOpenPosition != -1 && lastOpenPosition != position) {
+							if (lastOpen != null) {
+								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+							}
+							openItems.set(lastOpenPosition, false);
+						}
+						lastOpen = target;
+						lastOpenPosition = position;
+					} else if (lastOpenPosition == position) {
+						lastOpenPosition = -1;
+					}
+					animateView(target, type);
+				}
 			}
 		});
 	}
