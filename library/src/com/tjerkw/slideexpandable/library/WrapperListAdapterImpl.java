@@ -3,6 +3,7 @@ package com.tjerkw.slideexpandable.library;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.WrapperListAdapter;
 
@@ -18,7 +19,7 @@ import android.widget.WrapperListAdapter;
  * @author tjerk
  * @date 6/9/12 4:41 PM
  */
-public abstract class WrapperListAdapterImpl implements WrapperListAdapter {
+public abstract class WrapperListAdapterImpl extends BaseAdapter implements WrapperListAdapter {
 	protected ListAdapter wrapped;
 
 	public WrapperListAdapterImpl(ListAdapter wrapped) {
