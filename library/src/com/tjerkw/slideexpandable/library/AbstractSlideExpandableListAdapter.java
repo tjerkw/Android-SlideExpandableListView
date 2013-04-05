@@ -32,6 +32,13 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * Otherwise it points to the position of the last expanded list item
 	 */
 	private int lastOpenPosition = -1;
+	
+	/**
+	 * Default Animation duration
+	 * Set animation duration with @see setAnimationDuration
+	 */
+	private int animationDuration = 330;
+	
 	/**
 	 * A list of positions of all list items that are expanded.
 	 * Normally only one is expanded. But a mode to expand
@@ -101,8 +108,30 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 *
 	 * @return the duration of the anim in ms
 	 */
-	protected int getAnimationDuration() {
-		return 330;
+	public int getAnimationDuration() {
+		return animationDuration;
+	}
+	/**
+	 * Set's the Animation duration for the Expandable animation
+	 * 
+	 * @param duration The duration as an integer in MS (duration > 0)
+	 * @exception IllegalArgumentException if parameter is less than zero
+	 */
+	public void setAnimationDuration(int duration) {
+		if(duration < 0) {
+			throw new IllegalArgumentException("Duration is less than zero");
+		}
+		
+		animationDuration = duration;
+	}
+	/**
+	 * Check's if any position is currently Expanded
+	 * To collapse the open item @see collapseLastOpen
+	 * 
+	 * @return boolean True if there is currently an item expanded, otherwise false
+	 */
+	public boolean isAnyItemExpanded() {
+		return (lastOpenPosition != -1) ? true : false;
 	}
 
 	public void enableFor(View parent, int position) {
@@ -223,7 +252,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * @return true if an item was closed, false otherwise
 	 */
 	public boolean collapseLastOpen() {
-		if(lastOpenPosition != -1) {
+		if(isAnyItemExpanded()) {
 			// if visible animate it out
 			if(lastOpen != null) {
 				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
