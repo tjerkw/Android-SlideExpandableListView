@@ -115,9 +115,14 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * Set's the Animation duration for the Expandable animation
 	 * 
 	 * @param duration The duration as an integer in MS (duration > 0)
+	 * @exception IllegalArgumentException if parameter is less than zero
 	 */
 	public void setAnimationDuration(int duration) {
-		if(duration > 0) animationDuration = duration;
+		if(duration < 0) {
+			throw new IllegalArgumentException("Duration is less than zero");
+		}
+		
+		animationDuration = duration;
 	}
 	/**
 	 * Check's if any position is currently Expanded
