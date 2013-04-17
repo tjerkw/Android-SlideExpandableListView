@@ -63,13 +63,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private ViewGroup parent;
 	
-	/**
-	 * Sets the duration of the animation that scrolls the hidden expanded area into 
-	 * the visible view (in milliseconds) 
-	 */
-	private int scrollAnimationDuration = 1000; 
-	
-	
 	private boolean froyoOrAbove;
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
@@ -287,10 +280,10 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 							listView.getGlobalVisibleRect(r2);
 							
 							if (!visible) {
-								listView.smoothScrollBy(movement, scrollAnimationDuration);
+								listView.smoothScrollBy(movement, getAnimationDuration());
 							} else {
 								if (r2.bottom == r.bottom) {
-									listView.smoothScrollBy(movement, scrollAnimationDuration);
+									listView.smoothScrollBy(movement, getAnimationDuration());
 								}
 							}
 						}
