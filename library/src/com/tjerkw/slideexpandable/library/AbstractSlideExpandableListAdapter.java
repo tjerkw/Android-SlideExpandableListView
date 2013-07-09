@@ -140,6 +140,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		itemToolbar.measure(parent.getWidth(), parent.getHeight());
 
 		enableFor(more, itemToolbar, position);
+		itemToolbar.requestLayout();
 	}
 
 
