@@ -58,6 +58,63 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		super(wrapped);
 	}
 
+	private OnItemExpandCollapseListener expandCollapseListener;
+
+	/**
+	 * Sets a listener which gets call on item expand or collapse
+	 * 
+	 * @param listener
+	 *            the listener which will be called when an item is expanded or
+	 *            collapsed
+	 */
+	public void setItemExpandCollapseListener(
+			OnItemExpandCollapseListener listener) {
+		expandCollapseListener = listener;
+	}
+
+	public void removeItemExpandCollapseListener() {
+		expandCollapseListener = null;
+	}
+
+	/**
+	 * Interface for callback to be invoked whenever an item is expanded or
+	 * collapsed in the list view.
+	 */
+	public interface OnItemExpandCollapseListener {
+		/**
+		 * Called when an item is expanded.
+		 * 
+		 * @param itemView
+		 *            the view of the list item
+		 * @param position
+		 *            the position in the list view
+		 */
+		public void onExpand(View itemView, int position);
+
+		/**
+		 * Called when an item is collapsed.
+		 * 
+		 * @param itemView
+		 *            the view of the list item
+		 * @param position
+		 *            the position in the list view
+		 */
+		public void onCollapse(View itemView, int position);
+
+	}
+
+	private void notifiyExpandCollapseListener(int type, View view, int position) {
+		if (expandCollapseListener != null) {
+			if (type == ExpandCollapseAnimation.EXPAND) {
+				expandCollapseListener.onExpand(view, position);
+			} else if (type == ExpandCollapseAnimation.COLLAPSE) {
+				expandCollapseListener.onCollapse(view, position);
+			}
+		}
+
+	}
+
+
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		view = wrapped.getView(position, view, viewGroup);
@@ -203,6 +260,9 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						if (lastOpenPosition != -1 && lastOpenPosition != position) {
 							if (lastOpen != null) {
 								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+								notifiyExpandCollapseListener(
+										ExpandCollapseAnimation.COLLAPSE,
+										lastOpen, lastOpenPosition);
 							}
 							openItems.set(lastOpenPosition, false);
 						}
@@ -212,6 +272,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						lastOpenPosition = -1;
 					}
 					animateView(target, type);
+					notifiyExpandCollapseListener(type, target, position);
 				}
 			}
 		});
