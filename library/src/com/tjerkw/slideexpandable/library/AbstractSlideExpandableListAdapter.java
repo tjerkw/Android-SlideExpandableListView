@@ -1,13 +1,17 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.annotation.SuppressLint;
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import java.util.BitSet;
 
@@ -54,8 +58,25 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private final SparseIntArray viewHeights = new SparseIntArray(10);
 
+	/**
+	* Will point to the ListView
+	*/
+	private ViewGroup parent;
+
+	/**
+	* Sets the duration of the animation that scrolls the hidden expanded area into
+	* the visible view (in milliseconds)
+	*/
+	private int scrollAnimationDuration = 1000;
+
+	private boolean froyoOrAbove;
+
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.FROYO){
+			froyoOrAbove = true;
+		}
 	}
 
 	private OnItemExpandCollapseListener expandCollapseListener;
@@ -117,6 +138,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
+		this.parent = viewGroup;
 		view = wrapped.getView(position, view, viewGroup);
 		enableFor(view, position);
 		return view;
@@ -302,6 +324,41 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				type
 		);
 		anim.setDuration(getAnimationDuration());
+		if (froyoOrAbove) {
+			anim.setAnimationListener(new AnimationListener() {
+
+				@Override
+				public void onAnimationStart(Animation animation) {}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {}
+
+				@SuppressLint("NewApi")
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (type == ExpandCollapseAnimation.EXPAND) {
+						if (parent instanceof ListView) {
+							ListView listView = (ListView) parent;
+							int movement = target.getBottom();
+
+							Rect r = new Rect();
+							boolean visible = target.getGlobalVisibleRect(r);
+							Rect r2 = new Rect();
+							listView.getGlobalVisibleRect(r2);
+
+							if (!visible) {
+								listView.smoothScrollBy(movement, scrollAnimationDuration);
+							} else {
+								if (r2.bottom == r.bottom) {
+									listView.smoothScrollBy(movement, scrollAnimationDuration);
+								}
+							}
+						}
+					}
+
+				}
+			});
+		}
 		target.startAnimation(anim);
 	}
 
