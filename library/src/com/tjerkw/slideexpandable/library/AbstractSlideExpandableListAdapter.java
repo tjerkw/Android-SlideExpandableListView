@@ -1,7 +1,6 @@
 package com.tjerkw.slideexpandable.library;
 
 import java.util.BitSet;
-
 import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.os.Parcel;
@@ -63,6 +62,19 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private ViewGroup parent;
 	
+	private boolean froyoOrAbove;
+
+	/**
+	* Will point to the ListView
+	*/
+	private ViewGroup parent;
+
+	/**
+	* Sets the duration of the animation that scrolls the hidden expanded area into
+	* the visible view (in milliseconds)
+	*/
+	private int scrollAnimationDuration = 1000;
+
 	private boolean froyoOrAbove;
 
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
@@ -335,7 +347,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						if (parent instanceof ListView) {
 							ListView listView = (ListView) parent;
 							int movement = target.getBottom();
-							
+
 							Rect r = new Rect();
 							boolean visible = target.getGlobalVisibleRect(r);
 							Rect r2 = new Rect();
@@ -428,15 +440,15 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 		private SavedState(Parcel in) {
 			super(in);
-            lastOpenPosition = in.readInt();
-            openItems = readBitSet(in);
+			lastOpenPosition = in.readInt();
+			openItems = readBitSet(in);
 		}
 
 		@Override
 		public void writeToParcel(Parcel out, int flags) {
 			super.writeToParcel(out, flags);
-            out.writeInt(lastOpenPosition);
-            writeBitSet(out, openItems);
+			out.writeInt(lastOpenPosition);
+			writeBitSet(out, openItems);
 		}
 
 		//required field that makes Parcelables from a Parcel
