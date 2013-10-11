@@ -30,7 +30,7 @@ The list item view should have a toggle button (Button view), and a target view 
 By default the expandable view will be hidden. An when a user clicks the toggle button the
 expandalbe view will slide out and be visible.
 
-For example here below we have R.id.more Button view.
+For example here below we have R.id.expandable_toggle_button Button view.
 And a R.id.expandable LinearLayout which will be expanded.
 Note that the expandable view does not have to be a LinearLayout,
 it can be any subclass of View.
