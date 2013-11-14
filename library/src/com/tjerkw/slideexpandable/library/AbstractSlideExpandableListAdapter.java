@@ -315,15 +315,16 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 		private SavedState(Parcel in) {
 			super(in);
-			in.writeInt(lastOpenPosition);
-			writeBitSet(in, openItems);
+            lastOpenPosition = in.readInt();
+            openItems = readBitSet(in);
 		}
 
 		@Override
 		public void writeToParcel(Parcel out, int flags) {
 			super.writeToParcel(out, flags);
-			lastOpenPosition = out.readInt();
-			 openItems = readBitSet(out);
+            out.writeInt(lastOpenPosition);
+            writeBitSet(out, openItems);
+
 		}
 
 		//required field that makes Parcelables from a Parcel
