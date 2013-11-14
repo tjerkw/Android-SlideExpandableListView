@@ -324,7 +324,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			super.writeToParcel(out, flags);
             out.writeInt(lastOpenPosition);
             writeBitSet(out, openItems);
-
 		}
 
 		//required field that makes Parcelables from a Parcel
