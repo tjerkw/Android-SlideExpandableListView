@@ -1,13 +1,17 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.annotation.SuppressLint;
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import java.util.BitSet;
 
@@ -54,12 +58,87 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private final SparseIntArray viewHeights = new SparseIntArray(10);
 
+	/**
+	* Will point to the ListView
+	*/
+	private ViewGroup parent;
+
+	/**
+	* Sets the duration of the animation that scrolls the hidden expanded area into
+	* the visible view (in milliseconds)
+	*/
+	private int scrollAnimationDuration = 1000;
+
+	private boolean froyoOrAbove;
+
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
+		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.FROYO){
+			froyoOrAbove = true;
+		}
 	}
+
+	private OnItemExpandCollapseListener expandCollapseListener;
+
+	/**
+	 * Sets a listener which gets call on item expand or collapse
+	 * 
+	 * @param listener
+	 *            the listener which will be called when an item is expanded or
+	 *            collapsed
+	 */
+	public void setItemExpandCollapseListener(
+			OnItemExpandCollapseListener listener) {
+		expandCollapseListener = listener;
+	}
+
+	public void removeItemExpandCollapseListener() {
+		expandCollapseListener = null;
+	}
+
+	/**
+	 * Interface for callback to be invoked whenever an item is expanded or
+	 * collapsed in the list view.
+	 */
+	public interface OnItemExpandCollapseListener {
+		/**
+		 * Called when an item is expanded.
+		 * 
+		 * @param itemView
+		 *            the view of the list item
+		 * @param position
+		 *            the position in the list view
+		 */
+		public void onExpand(View itemView, int position);
+
+		/**
+		 * Called when an item is collapsed.
+		 * 
+		 * @param itemView
+		 *            the view of the list item
+		 * @param position
+		 *            the position in the list view
+		 */
+		public void onCollapse(View itemView, int position);
+
+	}
+
+	private void notifiyExpandCollapseListener(int type, View view, int position) {
+		if (expandCollapseListener != null) {
+			if (type == ExpandCollapseAnimation.EXPAND) {
+				expandCollapseListener.onExpand(view, position);
+			} else if (type == ExpandCollapseAnimation.COLLAPSE) {
+				expandCollapseListener.onCollapse(view, position);
+			}
+		}
+
+	}
+
 
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
+		this.parent = viewGroup;
 		view = wrapped.getView(position, view, viewGroup);
 		enableFor(view, position);
 		return view;
@@ -203,6 +282,9 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						if (lastOpenPosition != -1 && lastOpenPosition != position) {
 							if (lastOpen != null) {
 								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+								notifiyExpandCollapseListener(
+										ExpandCollapseAnimation.COLLAPSE,
+										lastOpen, lastOpenPosition);
 							}
 							openItems.set(lastOpenPosition, false);
 						}
@@ -212,6 +294,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						lastOpenPosition = -1;
 					}
 					animateView(target, type);
+					notifiyExpandCollapseListener(type, target, position);
 				}
 			}
 		});
@@ -241,6 +324,41 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				type
 		);
 		anim.setDuration(getAnimationDuration());
+		if (froyoOrAbove) {
+			anim.setAnimationListener(new AnimationListener() {
+
+				@Override
+				public void onAnimationStart(Animation animation) {}
+
+				@Override
+				public void onAnimationRepeat(Animation animation) {}
+
+				@SuppressLint("NewApi")
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					if (type == ExpandCollapseAnimation.EXPAND) {
+						if (parent instanceof ListView) {
+							ListView listView = (ListView) parent;
+							int movement = target.getBottom();
+
+							Rect r = new Rect();
+							boolean visible = target.getGlobalVisibleRect(r);
+							Rect r2 = new Rect();
+							listView.getGlobalVisibleRect(r2);
+
+							if (!visible) {
+								listView.smoothScrollBy(movement, scrollAnimationDuration);
+							} else {
+								if (r2.bottom == r.bottom) {
+									listView.smoothScrollBy(movement, scrollAnimationDuration);
+								}
+							}
+						}
+					}
+
+				}
+			});
+		}
 		target.startAnimation(anim);
 	}
 
