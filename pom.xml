@@ -16,8 +16,7 @@
 
 	<properties>
 		<androidApiLevel>8</androidApiLevel>
-		<androidVersion>2.2</androidVersion>
-		<androidApiRevision>r1</androidApiRevision>
+		<androidVersion>2.2.1</androidVersion>
 
 		<!-- build settings -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,7 +28,7 @@
 			<dependency>
 				<groupId>com.google.android</groupId>
 				<artifactId>android</artifactId>
-				<version>${androidVersion}_${androidApiRevision}</version>
+				<version>${androidVersion}</version>
 				<scope>provided</scope>
 			</dependency>
 		</dependencies>
