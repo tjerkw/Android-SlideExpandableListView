@@ -1,7 +1,6 @@
 package com.tjerkw.slideexpandable.library;
 
 import java.util.BitSet;
-import android.annotation.SuppressLint;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -56,24 +55,11 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * The height is calculated just before the view is drawn.
 	 */
 	private final SparseIntArray viewHeights = new SparseIntArray(10);
-	
-	/**
-	 * Will point to the ListView
-	 */
-	private ViewGroup parent;
-	
-	private boolean froyoOrAbove;
 
 	/**
 	* Will point to the ListView
 	*/
 	private ViewGroup parent;
-
-	/**
-	* Sets the duration of the animation that scrolls the hidden expanded area into
-	* the visible view (in milliseconds)
-	*/
-	private int scrollAnimationDuration = 1000;
 
 	private boolean froyoOrAbove;
 
@@ -340,7 +326,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				@Override
 				public void onAnimationRepeat(Animation animation) {}
 
-				@SuppressLint("NewApi")
 				@Override
 				public void onAnimationEnd(Animation animation) {
 					if (type == ExpandCollapseAnimation.EXPAND) {
@@ -399,17 +384,23 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 	public void onRestoreInstanceState(SavedState state) {
 
-		this.lastOpenPosition = state.lastOpenPosition;
-		this.openItems = state.openItems;
+		if (state != null) {
+			this.lastOpenPosition = state.lastOpenPosition;
+			this.openItems = state.openItems;
+		}
 	}
 
 	/**
 	 * Utility methods to read and write a bitset from and to a Parcel
 	 */
 	private static BitSet readBitSet(Parcel src) {
+		BitSet set = new BitSet();
+		if (src == null) {
+			return set;
+		}
 		int cardinality = src.readInt();
 
-		BitSet set = new BitSet();
+
 		for (int i = 0; i < cardinality; i++) {
 			set.set(src.readInt());
 		}
@@ -419,6 +410,10 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 	private static void writeBitSet(Parcel dest, BitSet set) {
 		int nextSetBit = -1;
+
+		if (dest == null || set == null) {
+			return; // at least dont crash
+		}
 
 		dest.writeInt(set.cardinality());
 

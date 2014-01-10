@@ -15,13 +15,13 @@
 	</modules>
 
 	<properties>
-		<androidApiLevel>4</androidApiLevel>
-		<androidVersion>1.6</androidVersion>
-		<androidApiRevision>r2</androidApiRevision>
+		<androidApiLevel>8</androidApiLevel>
+		<androidVersion>2.2</androidVersion>
+		<androidApiRevision>r1</androidApiRevision>
 
 		<!-- build settings -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sourceCompatibility>1.6</sourceCompatibility>
+		<sourceCompatibility>2.2</sourceCompatibility>
 	</properties>
 
 	<dependencyManagement>
