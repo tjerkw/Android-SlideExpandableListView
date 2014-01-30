@@ -63,6 +63,15 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 	private boolean froyoOrAbove;
 
+    /**
+     * Determines if adapter should collapse the last expanded View before expanding a new one
+     */
+    private boolean collapseLastExpanded = true;
+
+    public void setCollapseLastExpanded (boolean value){
+        collapseLastExpanded = value;
+    }
+
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
 		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
@@ -148,7 +157,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * A listener will be attached to the button which will
 	 * either expand or collapse the expandable view
 	 *
-	 * @see #getExpandableView(View)
+	 * @see #getExpandableView(android.view.View)
 	 * @param parent the list view item
 	 * @ensure return!=null
 	 * @return a child of parent which is a button
@@ -165,7 +174,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 * return parent.findViewById(R.id.expandable)
 	 * </pre>
 	 *
-	 * @see #getExpandToggleButton(View)
+	 * @see #getExpandToggleButton(android.view.View)
 	 * @param parent the list view item
 	 * @ensure return!=null
 	 * @return a child of parent which is a view (or often ViewGroup)
@@ -214,7 +223,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		itemToolbar.requestLayout();
 	}
 
-
 	private void enableFor(final View button, final View target, final int position) {
 		if(target == lastOpen && position!=lastOpenPosition) {
 			// lastOpen is recycled, so its reference is false
@@ -238,10 +246,9 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			public void onClick(final View view) {
 
 				Animation a = target.getAnimation();
-
 				if (a != null && a.hasStarted() && !a.hasEnded()) {
 
-					a.setAnimationListener(new Animation.AnimationListener() {
+					a.setAnimationListener(new AnimationListener() {
 						@Override
 						public void onAnimationStart(Animation animation) {
 						}
@@ -257,7 +264,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 					});
 
 				} else {
-
 					target.setAnimation(null);
 
 					int type = target.getVisibility() == View.VISIBLE
@@ -270,22 +276,25 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 					} else {
 						openItems.set(position, false);
 					}
-					// check if we need to collapse a different view
-					if (type == ExpandCollapseAnimation.EXPAND) {
-						if (lastOpenPosition != -1 && lastOpenPosition != position) {
-							if (lastOpen != null) {
-								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
-								notifiyExpandCollapseListener(
-										ExpandCollapseAnimation.COLLAPSE,
-										lastOpen, lastOpenPosition);
-							}
-							openItems.set(lastOpenPosition, false);
-						}
-						lastOpen = target;
-						lastOpenPosition = position;
-					} else if (lastOpenPosition == position) {
-						lastOpenPosition = -1;
-					}
+
+                    if(collapseLastExpanded){
+                        // check if we need to collapse a different view
+                        if (type == ExpandCollapseAnimation.EXPAND) {
+                            if (lastOpenPosition != -1 && lastOpenPosition != position) {
+                                if (lastOpen != null) {
+                                    animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+                                    notifiyExpandCollapseListener(
+                                            ExpandCollapseAnimation.COLLAPSE,
+                                            lastOpen, lastOpenPosition);
+                                }
+                                openItems.set(lastOpenPosition, false);
+                            }
+                            lastOpen = target;
+                            lastOpenPosition = position;
+                        } else if (lastOpenPosition == position) {
+                            lastOpenPosition = -1;
+                        }
+                    }
 					animateView(target, type);
 					notifiyExpandCollapseListener(type, target, position);
 				}
@@ -447,8 +456,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		}
 
 		//required field that makes Parcelables from a Parcel
-		public static final Parcelable.Creator<SavedState> CREATOR =
-		new Parcelable.Creator<SavedState>() {
+		public static final Creator<SavedState> CREATOR =
+		new Creator<SavedState>() {
 			public SavedState createFromParcel(Parcel in) {
 				return new SavedState(in);
 			}
