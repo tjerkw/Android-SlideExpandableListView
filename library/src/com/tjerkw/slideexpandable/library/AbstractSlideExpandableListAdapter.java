@@ -61,14 +61,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	*/
 	private ViewGroup parent;
 
-	private boolean froyoOrAbove;
-
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
-		int currentapiVersion = android.os.Build.VERSION.SDK_INT;
-		if (currentapiVersion >= android.os.Build.VERSION_CODES.FROYO){
-			froyoOrAbove = true;
-		}
 	}
 
 	private OnItemExpandCollapseListener expandCollapseListener;
@@ -317,40 +311,38 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				type
 		);
 		anim.setDuration(getAnimationDuration());
-		if (froyoOrAbove) {
-			anim.setAnimationListener(new AnimationListener() {
+		anim.setAnimationListener(new AnimationListener() {
 
-				@Override
-				public void onAnimationStart(Animation animation) {}
+			@Override
+			public void onAnimationStart(Animation animation) {}
 
-				@Override
-				public void onAnimationRepeat(Animation animation) {}
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
 
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					if (type == ExpandCollapseAnimation.EXPAND) {
-						if (parent instanceof ListView) {
-							ListView listView = (ListView) parent;
-							int movement = target.getBottom();
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				if (type == ExpandCollapseAnimation.EXPAND) {
+					if (parent instanceof ListView) {
+						ListView listView = (ListView) parent;
+						int movement = target.getBottom();
 
-							Rect r = new Rect();
-							boolean visible = target.getGlobalVisibleRect(r);
-							Rect r2 = new Rect();
-							listView.getGlobalVisibleRect(r2);
-							
-							if (!visible) {
+						Rect r = new Rect();
+						boolean visible = target.getGlobalVisibleRect(r);
+						Rect r2 = new Rect();
+						listView.getGlobalVisibleRect(r2);
+						
+						if (!visible) {
+							listView.smoothScrollBy(movement, getAnimationDuration());
+						} else {
+							if (r2.bottom == r.bottom) {
 								listView.smoothScrollBy(movement, getAnimationDuration());
-							} else {
-								if (r2.bottom == r.bottom) {
-									listView.smoothScrollBy(movement, getAnimationDuration());
-								}
 							}
 						}
 					}
-
 				}
-			});
-		}
+
+			}
+		});
 		target.startAnimation(anim);
 	}
 
