@@ -39,12 +39,17 @@ class SlideExpandableListView extends ListView {
 		return false;
 	}
 
-	public void setAdapter(ListAdapter adapter) {
-		this.adapter = new SlideExpandableListAdapter(adapter);
-		super.setAdapter(this.adapter);
-	}
+    public void setAdapter(ListAdapter adapter) {
+        this.adapter = new SlideExpandableListAdapter(adapter);
+        super.setAdapter(this.adapter);
+    }
 
-	/**
+    public void setAdapter(ListAdapter adapter, int toggle_button_id, int expandable_view_id) {
+        this.adapter = new SlideExpandableListAdapter(adapter, toggle_button_id, expandable_view_id);
+        super.setAdapter(this.adapter);
+    }
+
+    /**
 	 * Registers a OnItemClickListener for this listview which will
 	 * expand the item by default. Any other OnItemClickListener will be overriden.
 	 *
