@@ -120,12 +120,7 @@ See the sample app for usage information.
 
 ### Including In Your Project
 
-Currently you have to checkout the project, include it in your eclipse and ensure your project includes it.
-
-I am working on putting it in maven Central so it can be easily added to any maven Android project.
-
-A jar may also be an option, however i want to extend this library with android resources,
-which you cannot include as a jar file.
+Add the library as a gradle dependency to your project.
 
 ## Pull Requests
 
