@@ -6,10 +6,9 @@
 out
 gen-external-apklibs
 
-#Maven
-target
-release.properties
-pom.xml.*
+#Gradke
+.gradle
+build
 
 #OSX
 .DS_Store
