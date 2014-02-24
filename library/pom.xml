@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.tjerkw</groupId>
 	<artifactId>slideexpandablelistview-library</artifactId>
-	<packaging>apklib</packaging>
+	<packaging>aar</packaging>
 	<name>Android-SlideExpandableListView Library</name>
 
 	<dependencies>
