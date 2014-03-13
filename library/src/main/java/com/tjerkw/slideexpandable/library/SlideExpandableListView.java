@@ -1,18 +1,20 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.content.Context;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.content.Context;
+
+import static com.tjerkw.slideexpandable.library.AbstractSlideExpandableListAdapter.OnItemExpandCollapseListener;
 
 /**
  * Simple subclass of listview which does nothing more than wrap
  * any ListAdapter in a SlideExpandalbeListAdapter
  */
-class SlideExpandableListView extends ListView {
+public class SlideExpandableListView extends ListView {
 	private SlideExpandableListAdapter adapter;
 
 	public SlideExpandableListView(Context context) {
@@ -67,6 +69,27 @@ class SlideExpandableListView extends ListView {
 		});
 	}
 
+	/**
+	 * Sets a listener which gets call on item expand or collapse
+	 *
+	 * @param listener
+	 *            the listener which will be called when an item is expanded or
+	 *            collapsed
+	 */
+	public void setItemExpandCollapseListener(OnItemExpandCollapseListener listener) {
+		adapter.setItemExpandCollapseListener(listener);
+	}
+
+	/**
+	 * If a view is trying to expand beyond the bounds of the list view,
+	 * scroll the list to fit the expanded view.
+	 *
+	 * @param adjustToFit
+	 *            true if the view should adjust to fit, false otherwise
+	 */
+	public void setAdjustToFit(boolean adjustToFit) {
+		adapter.setAdjustToFit(adjustToFit);
+	}
 
 	@Override
 	public Parcelable onSaveInstanceState() {
