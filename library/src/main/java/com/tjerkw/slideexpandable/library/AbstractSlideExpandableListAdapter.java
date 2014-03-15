@@ -1,6 +1,5 @@
 package com.tjerkw.slideexpandable.library;
 
-import java.util.BitSet;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,10 +7,11 @@ import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
+import java.util.BitSet;
 
 /**
  * Wraps a ListAdapter to give it expandable list view functionality.
@@ -22,6 +22,10 @@ import android.widget.ListView;
  * @date 6/9/12 4:41 PM
  */
 public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdapterImpl {
+
+	private static final int TAG_EXPANDABLE_VIEW = 381286553;
+	private static final int TAG_EXPAND_TOGGLE_BUTTON = 668645171;
+
 	/**
 	 * Reference to the last expanded list item.
 	 * Since lists are recycled this might be null if
@@ -50,11 +54,17 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private BitSet openItems = new BitSet();
 	/**
-	 * We remember, for each collapsable view its height.
-	 * So we dont need to recalculate.
+	 * We remember, for each collapsible view its height.
+	 * So we don't need to recalculate.
 	 * The height is calculated just before the view is drawn.
 	 */
 	private final SparseIntArray viewHeights = new SparseIntArray(10);
+
+	/**
+	 * If a view is trying to expand beyond the bounds of the list view,
+	 * scroll the list to fit the expanded view.
+	 */
+	private boolean adjustToFit = true;
 
 	/**
 	* Will point to the ListView
@@ -84,6 +94,17 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	}
 
 	/**
+	 * If a view is trying to expand beyond the bounds of the list view,
+	 * scroll the list to fit the expanded view.
+	 *
+	 * @param adjustToFit
+	 *            true if the view should adjust to fit, false otherwise
+	 */
+	public void setAdjustToFit(boolean adjustToFit) {
+		this.adjustToFit = adjustToFit;
+	}
+
+	/**
 	 * Interface for callback to be invoked whenever an item is expanded or
 	 * collapsed in the list view.
 	 */
@@ -110,7 +131,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 	}
 
-	private void notifiyExpandCollapseListener(int type, View view, int position) {
+	private void notifyExpandCollapseListener(int type, View view, int position) {
 		if (expandCollapseListener != null) {
 			if (type == ExpandCollapseAnimation.EXPAND) {
 				expandCollapseListener.onExpand(view, position);
@@ -167,6 +188,24 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	public abstract View getExpandableView(View parent);
 
+	private View findExpandToggleButton(View parent) {
+		View view = (View) parent.getTag(TAG_EXPAND_TOGGLE_BUTTON);
+		if (view == null) {
+			view = getExpandToggleButton(parent);
+			parent.setTag(TAG_EXPAND_TOGGLE_BUTTON, view);
+		}
+		return view;
+	}
+
+	private View findExpandableView(View parent) {
+		View view = (View) parent.getTag(TAG_EXPANDABLE_VIEW);
+		if (view == null) {
+			view = getExpandableView(parent);
+			parent.setTag(TAG_EXPANDABLE_VIEW, view);
+		}
+		return view;
+	}
+
 	/**
 	 * Gets the duration of the collapse animation in ms.
 	 * Default is 330ms. Override this method to change the default.
@@ -199,25 +238,19 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		return (lastOpenPosition != -1) ? true : false;
 	}
 
-	public void enableFor(View parent, int position) {
-		View more = getExpandToggleButton(parent);
-		View itemToolbar = getExpandableView(parent);
-		itemToolbar.measure(parent.getWidth(), parent.getHeight());
+	public void enableFor(final View parent, final int position) {
+		final View button = findExpandToggleButton(parent);
+		final View target = findExpandableView(parent);
+		target.measure(parent.getWidth(), parent.getHeight());
 
-		enableFor(more, itemToolbar, position);
-		itemToolbar.requestLayout();
-	}
-
-
-	private void enableFor(final View button, final View target, final int position) {
-		if(target == lastOpen && position!=lastOpenPosition) {
+		if(parent == lastOpen && position!=lastOpenPosition) {
 			// lastOpen is recycled, so its reference is false
 			lastOpen = null;
 		}
 		if(position == lastOpenPosition) {
 			// re reference to the last view
 			// so when can animate it when collapsed
-			lastOpen = target;
+			lastOpen = parent;
 		}
 		int height = viewHeights.get(position, -1);
 		if(height == -1) {
@@ -226,7 +259,9 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		} else {
 			updateExpandable(target, position);
 		}
+		target.requestLayout();
 
+		button.setSelected(openItems.get(position));
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View view) {
@@ -268,23 +303,30 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 					if (type == ExpandCollapseAnimation.EXPAND) {
 						if (lastOpenPosition != -1 && lastOpenPosition != position) {
 							if (lastOpen != null) {
-								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
-								notifiyExpandCollapseListener(
+								toggleExpand(
+										lastOpen,
 										ExpandCollapseAnimation.COLLAPSE,
-										lastOpen, lastOpenPosition);
+										lastOpenPosition);
 							}
 							openItems.set(lastOpenPosition, false);
 						}
-						lastOpen = target;
+						lastOpen = parent;
 						lastOpenPosition = position;
 					} else if (lastOpenPosition == position) {
 						lastOpenPosition = -1;
 					}
-					animateView(target, type);
-					notifiyExpandCollapseListener(type, target, position);
+					toggleExpand(parent, type, position);
 				}
 			}
 		});
+	}
+
+	private void toggleExpand(View view, int type, int position) {
+		View target = findExpandableView(view);
+		View button = findExpandToggleButton(view);
+		button.setSelected(type == ExpandCollapseAnimation.EXPAND);
+		animateView(target, type);
+		notifyExpandCollapseListener(type, target, position);
 	}
 
 	private void updateExpandable(View target, int position) {
@@ -311,17 +353,32 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				type
 		);
 		anim.setDuration(getAnimationDuration());
-		anim.setAnimationListener(new AnimationListener() {
+
+		if (adjustToFit && type == ExpandCollapseAnimation.EXPAND) {
+			anim.setAnimationListener(new AdjustAnimationListener(target));
+		}
+		target.startAnimation(anim);
+	}
+
+	private class AdjustAnimationListener implements Animation.AnimationListener {
+
+		private View target;
+
+		AdjustAnimationListener(View target) {
+			this.target = target;
+		}
 
 			@Override
-			public void onAnimationStart(Animation animation) {}
+		public void onAnimationStart(Animation animation) {
+		}
 
 			@Override
-			public void onAnimationRepeat(Animation animation) {}
+		public void onAnimationRepeat(Animation animation) {
+		}
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				if (type == ExpandCollapseAnimation.EXPAND) {
+
 					if (parent instanceof ListView) {
 						ListView listView = (ListView) parent;
 						int movement = target.getBottom();
@@ -340,10 +397,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						}
 					}
 				}
-
-			}
-		});
-		target.startAnimation(anim);
 	}
 
 
@@ -357,7 +410,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		if(isAnyItemExpanded()) {
 			// if visible animate it out
 			if(lastOpen != null) {
-				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+				toggleExpand(lastOpen, ExpandCollapseAnimation.COLLAPSE, lastOpenPosition);
 			}
 			openItems.set(lastOpenPosition, false);
 			lastOpenPosition = -1;
@@ -404,7 +457,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		int nextSetBit = -1;
 
 		if (dest == null || set == null) {
-			return; // at least dont crash
+			return; // at least don't crash
 		}
 
 		dest.writeInt(set.cardinality());
