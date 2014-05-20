@@ -4,6 +4,7 @@ import java.util.BitSet;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,6 +23,7 @@ import android.widget.ListView;
  * @date 6/9/12 4:41 PM
  */
 public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdapterImpl {
+	private static final String TAG = "AbstractSlideExpandableListAdapter";
 	/**
 	 * Reference to the last expanded list item.
 	 * Since lists are recycled this might be null if
@@ -324,18 +326,25 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				if (type == ExpandCollapseAnimation.EXPAND) {
 					if (parent instanceof ListView) {
 						ListView listView = (ListView) parent;
-						int movement = target.getBottom();
 
 						Rect r = new Rect();
 						boolean visible = target.getGlobalVisibleRect(r);
+
 						Rect r2 = new Rect();
 						listView.getGlobalVisibleRect(r2);
-						
+
+						Rect r3 = new Rect();
+						target.getDrawingRect(r3);
+
+						final int[] location = new int[2];
+						target.getLocationInWindow(location);
+						int bottom = location[1] + r3.height();
+
 						if (!visible) {
-							listView.smoothScrollBy(movement, getAnimationDuration());
+							listView.smoothScrollBy(bottom - r2.bottom, getAnimationDuration());
 						} else {
-							if (r2.bottom == r.bottom) {
-								listView.smoothScrollBy(movement, getAnimationDuration());
+							if (bottom > r2.bottom) {
+								listView.smoothScrollBy(bottom - r2.bottom, getAnimationDuration());
 							}
 						}
 					}
