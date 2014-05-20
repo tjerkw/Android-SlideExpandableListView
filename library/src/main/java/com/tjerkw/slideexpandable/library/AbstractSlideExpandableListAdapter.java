@@ -4,7 +4,6 @@ import java.util.BitSet;
 import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,36 +90,35 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	public interface OnItemExpandCollapseListener {
 		/**
-		 * Called when an item is expanded.
-		 * 
-		 * @param itemView
-		 *            the view of the list item
-		 * @param position
-		 *            the position in the list view
+		 * Called when an item is expanding/collapsing.
+		 *
+		 * @param itemView  the view of the list item
+		 * @param position  the position in the list view
+		 * @param expanding true if expanding, false otherwise
 		 */
-		public void onExpand(View itemView, int position);
+		public void onExpandStart(View itemView, int position, boolean expanding);
 
 		/**
-		 * Called when an item is collapsed.
-		 * 
-		 * @param itemView
-		 *            the view of the list item
-		 * @param position
-		 *            the position in the list view
+		 * Called when an item is finished animating.
+		 *
+		 * @param itemView the view of the list item
+		 * @param position the position in the list view
+		 * @param expanded true if expanded, false otherwise
 		 */
-		public void onCollapse(View itemView, int position);
+		public void onExpandEnd(View itemView, int position, boolean expanded);
 
 	}
 
-	private void notifiyExpandCollapseListener(int type, View view, int position) {
+	private void notifiyBeginExpandCollapseListener(int type, View view, int position) {
 		if (expandCollapseListener != null) {
-			if (type == ExpandCollapseAnimation.EXPAND) {
-				expandCollapseListener.onExpand(view, position);
-			} else if (type == ExpandCollapseAnimation.COLLAPSE) {
-				expandCollapseListener.onCollapse(view, position);
-			}
+			expandCollapseListener.onExpandStart(view, position, type == ExpandCollapseAnimation.EXPAND);
 		}
+	}
 
+	private void notifiyEndExpandCollapseListener(int type, View view, int position) {
+		if (expandCollapseListener != null) {
+			expandCollapseListener.onExpandEnd(view, position, type == ExpandCollapseAnimation.EXPAND);
+		}
 	}
 
 
@@ -235,7 +233,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 				Animation a = target.getAnimation();
 
-				if (a != null && a.hasStarted() && !a.hasEnded()) {
+				if (a != null && a.hasStarted() && ! a.hasEnded()) {
 
 					a.setAnimationListener(new Animation.AnimationListener() {
 						@Override
@@ -252,38 +250,38 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						}
 					});
 
-				} else {
+				}
+				else {
 
 					target.setAnimation(null);
 
-					int type = target.getVisibility() == View.VISIBLE
-							? ExpandCollapseAnimation.COLLAPSE
-							: ExpandCollapseAnimation.EXPAND;
+					int type =
+						target.getVisibility() == View.VISIBLE ? ExpandCollapseAnimation.COLLAPSE : ExpandCollapseAnimation.EXPAND;
 
 					// remember the state
 					if (type == ExpandCollapseAnimation.EXPAND) {
 						openItems.set(position, true);
-					} else {
+					}
+					else {
 						openItems.set(position, false);
 					}
 					// check if we need to collapse a different view
 					if (type == ExpandCollapseAnimation.EXPAND) {
-						if (lastOpenPosition != -1 && lastOpenPosition != position) {
+						if (lastOpenPosition != - 1 && lastOpenPosition != position) {
 							if (lastOpen != null) {
-								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
-								notifiyExpandCollapseListener(
-										ExpandCollapseAnimation.COLLAPSE,
-										lastOpen, lastOpenPosition);
+								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE, lastOpenPosition);
+								notifiyBeginExpandCollapseListener(ExpandCollapseAnimation.COLLAPSE, lastOpen, lastOpenPosition);
 							}
 							openItems.set(lastOpenPosition, false);
 						}
 						lastOpen = target;
 						lastOpenPosition = position;
-					} else if (lastOpenPosition == position) {
-						lastOpenPosition = -1;
 					}
-					animateView(target, type);
-					notifiyExpandCollapseListener(type, target, position);
+					else if (lastOpenPosition == position) {
+						lastOpenPosition = - 1;
+					}
+					animateView(target, type, position);
+					notifiyBeginExpandCollapseListener(type, target, position);
 				}
 			}
 		});
@@ -301,13 +299,17 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		}
 	}
 
+	public boolean isExpanded(int position) {
+		return openItems.get(position);
+	}
+
 	/**
 	 * Performs either COLLAPSE or EXPAND animation on the target view
 	 * @param target the view to animate
 	 * @param type the animation type, either ExpandCollapseAnimation.COLLAPSE
 	 *			 or ExpandCollapseAnimation.EXPAND
 	 */
-	private void animateView(final View target, final int type) {
+	private void animateView(final View target, final int type, final int position) {
 		Animation anim = new ExpandCollapseAnimation(
 				target,
 				type
@@ -349,7 +351,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 						}
 					}
 				}
-
+				notifiyEndExpandCollapseListener(type, target, position);
 			}
 		});
 		target.startAnimation(anim);
@@ -366,7 +368,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		if(isAnyItemExpanded()) {
 			// if visible animate it out
 			if(lastOpen != null) {
-				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+				animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE, lastOpenPosition);
 			}
 			openItems.set(lastOpenPosition, false);
 			lastOpenPosition = -1;
