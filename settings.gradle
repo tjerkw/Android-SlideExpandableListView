@@ -1,1 +1,5 @@
 include ':library'
+
+// changing the name because Android Studio doesn't like libraries with
+// the same name - version
+project(":library").name = "slideexpandable"
