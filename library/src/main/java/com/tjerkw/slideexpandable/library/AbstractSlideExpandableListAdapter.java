@@ -12,6 +12,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.AbsListView;
 
 /**
  * Wraps a ListAdapter to give it expandable list view functionality.
@@ -326,8 +327,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				if (type == ExpandCollapseAnimation.EXPAND) {
-					if (parent instanceof ListView) {
-						ListView listView = (ListView) parent;
+					if (parent instanceof AbsListView) {
+						AbsListView listView = (AbsListView) parent;
 
 						Rect r = new Rect();
 						boolean visible = target.getGlobalVisibleRect(r);
