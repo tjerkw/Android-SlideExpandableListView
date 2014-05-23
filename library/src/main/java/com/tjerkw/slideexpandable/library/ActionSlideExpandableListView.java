@@ -1,7 +1,9 @@
 package com.tjerkw.slideexpandable.library;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -37,7 +39,23 @@ public class ActionSlideExpandableListView extends SlideExpandableListView {
 		this.buttonIds = buttonIds;
 	}
 
-	/**
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER) {
+            SlideExpandableListAdapter adapter = (SlideExpandableListAdapter)getAdapter();
+            View item = getSelectedView();
+            if(item != null) {
+                adapter.getExpandToggleButton(item).performClick();
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    item.setActivated(true);
+                }
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    /**
 	 * Interface for callback to be invoked whenever an action is clicked in
 	 * the expandle area of the list item.
 	 */
