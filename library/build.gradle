@@ -13,7 +13,7 @@ apply plugin: 'android-library'
 apply plugin: 'signing'
 
 group 'it.sephiroth.android.library.fork.slideexpandable'
-version '1.0.3'
+version '1.0.3.1'
 
 android {
     compileSdkVersion 19
