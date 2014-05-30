@@ -3,13 +3,102 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.8.+'
+        classpath 'com.android.tools.build:gradle:0.10.2'
     }
 }
 
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: 'android-library'
+apply plugin: 'signing'
+
+group 'it.sephiroth.android.library.fork.slideexpandable'
+version '1.0.3.1'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion = '19.0.1'
+    buildToolsVersion = '19.0.3'
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+        versionCode 1
+        versionName version
+    }
+}
+
+signing {
+    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
+    sign configurations.archives
+}
+
+def generatePom() {
+    def pom = pom{
+        project {
+            name 'slideexpandable'
+            packaging 'aar'
+            groupId project.group
+            artifactId project.name
+            version project.version
+            description 'Fork of the original Android-SlideExpandableListView at https://github.com/tjerkw/Android-SlideExpandableListView'
+            url 'https://github.com/sephiroth74/Android-SlideExpandableListView'
+
+            licenses {
+                license {
+                    name 'Apache License 2.0'
+                    url 'https://github.com/tjerkw/Android-SlideExpandableListView/blob/master/LICENSE.txt'
+                    distribution 'repo'
+                }
+            }            
+
+            scm {
+                url                 "https://github.com/sephiroth74/Android-SlideExpandableListView"
+                connection          "scm:git:git@github.com:sephiroth74/Android-SlideExpandableListView.git"
+                developerConnection "scm:git:git@github.com:sephiroth74/Android-SlideExpandableListView.git"
+            }
+
+            developers {
+                developer {
+                    id 'tjerkw'
+                    name 'Tjerk Wolterink'
+                    url 'http://tjerkw.com/'
+                    roles {
+                        role 'author'
+                    }
+                }
+                developer {
+                    id 'sephiroth74'
+                    name 'Alessandro Crugnola'
+                    email 'alessandro.crugnola@gmail.com'
+                    url 'http://blog.sephiroth.it'
+                    roles {
+                        role 'contributor'
+                    }
+                }
+            }
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment {
+                MavenDeployment deployment -> signing.signPom(deployment)
+            }
+            pom = generatePom()
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword )
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword )
+            }
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12'
 }
