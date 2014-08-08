@@ -1,6 +1,5 @@
 package com.tjerkw.slideexpandable.library;
 
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -45,7 +44,6 @@ public class ExpandCollapseAnimation extends Animation {
 
 	@Override
 	protected void applyTransformation(float interpolatedTime, Transformation t) {
-
 		super.applyTransformation(interpolatedTime, t);
 		if (interpolatedTime < 1.0f) {
 			if(mType == EXPAND) {
@@ -53,7 +51,7 @@ public class ExpandCollapseAnimation extends Animation {
 			} else {
 				mLayoutParams.bottomMargin = - (int) (mEndHeight * interpolatedTime);
 			}
-			Log.d("ExpandCollapseAnimation", "anim height " + mLayoutParams.bottomMargin);
+			//Log.d("ExpandCollapseAnimation", "anim height " + mLayoutParams.bottomMargin);
 			mAnimatedView.requestLayout();
 		} else {
 			if(mType == EXPAND) {
