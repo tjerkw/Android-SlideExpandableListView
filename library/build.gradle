@@ -10,7 +10,7 @@ buildscript {
 apply plugin: 'android-library'
 
 group='com.tjerkw.slideexpandable'
-artifact='library'
+archivesBaseName='library'
 version = '1.0'
 
 android {
