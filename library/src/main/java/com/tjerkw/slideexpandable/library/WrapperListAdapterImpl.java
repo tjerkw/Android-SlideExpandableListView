@@ -20,10 +20,12 @@ import android.widget.WrapperListAdapter;
  * @date 6/9/12 4:41 PM
  */
 public abstract class WrapperListAdapterImpl extends BaseAdapter implements WrapperListAdapter {
-	protected ListAdapter wrapped;
+	protected final ListAdapter wrapped;
+	private final boolean isBaseAdapter;
 
 	public WrapperListAdapterImpl(ListAdapter wrapped) {
 		this.wrapped = wrapped;
+		this.isBaseAdapter = BaseAdapter.class.isAssignableFrom(wrapped.getClass());
 	}
 
 	@Override
@@ -90,4 +92,19 @@ public abstract class WrapperListAdapterImpl extends BaseAdapter implements Wrap
 	public boolean isEmpty() {
 		return wrapped.isEmpty();
 	}
+
+	@Override
+	public void notifyDataSetChanged() {
+		if ( isBaseAdapter ){
+			((BaseAdapter)wrapped).notifyDataSetChanged();
+		}
+	}
+	
+	@Override
+	public void notifyDataSetInvalidated() {
+		if ( isBaseAdapter ){
+			((BaseAdapter)wrapped).notifyDataSetInvalidated();
+		}
+	}
+
 }
