@@ -53,7 +53,7 @@ public class ExpandCollapseAnimation extends Animation {
 			} else {
 				mLayoutParams.bottomMargin = - (int) (mEndHeight * interpolatedTime);
 			}
-			Log.d("ExpandCollapseAnimation", "anim height " + mLayoutParams.bottomMargin);
+			//Log.d("ExpandCollapseAnimation", "anim height " + mLayoutParams.bottomMargin);
 			mAnimatedView.requestLayout();
 		} else {
 			if(mType == EXPAND) {

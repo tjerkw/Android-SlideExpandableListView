@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 import com.tjerkw.slideexpandable.library.ActionSlideExpandableListView;
-import com.tjerkw.slideexpandable.library.SlideExpandableListAdapter;
 
 /**
  * This example shows a expandable listview

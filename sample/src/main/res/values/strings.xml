@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">SlideExpandable Example</string>
+    <string name="example">Example</string>
+    <string name="example_with_listener_animation">Example with listener animations</string>
 </resources>
