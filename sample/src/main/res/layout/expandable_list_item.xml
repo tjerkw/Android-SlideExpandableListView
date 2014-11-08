@@ -1,53 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:slide="http://schemas.android.com/apk/res/com.tjerkw.slideexpandable.library"
-              android:layout_width="fill_parent"
-              android:layout_height="wrap_content"
-              android:orientation="vertical">
-	<RelativeLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:id="@+id/item">
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
-		<TextView
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:id="@+id/text"
-				android:text="Hello World" android:textSize="40dp"/>
+    <RelativeLayout
+        android:id="@+id/item"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-		<Button
-				android:id="@+id/expandable_toggle_button"
-				android:text="More"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:layout_alignBottom="@+id/text"
-				android:layout_alignParentRight="true"
-				android:layout_alignTop="@id/text" android:textSize="30dp"/>
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:text="Hello World"
+            android:textSize="40dp" />
 
-	</RelativeLayout>
+        <Button
+            android:id="@+id/expandable_toggle_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/text"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/text"
+            android:text="More"
+            android:textSize="30dp" />
 
-	<LinearLayout
-			android:layout_width="fill_parent"
-			android:layout_height="wrap_content"
-			android:orientation="horizontal"
-			android:id="@+id/expandable"
-			android:background="#000000">
+    </RelativeLayout>
 
-		<Button
-				android:id="@+id/buttonA"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent" android:layout_weight="0.5"
-				android:text="Action A"
-				android:textSize="12dip"/>
+    <LinearLayout
+        android:id="@+id/expandable"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="#000000"
+        android:orientation="horizontal">
 
-		<Button
-				android:id="@+id/buttonB"
-				android:layout_width="fill_parent"
-				android:layout_height="fill_parent"
-				android:layout_weight="0.5"
-				android:text="Action B"
-				android:textSize="12dip"/>
+        <Button
+            android:id="@+id/buttonA"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:text="Action A"
+            android:textSize="12dip" />
 
-	</LinearLayout>
+        <Button
+            android:id="@+id/buttonB"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="0.5"
+            android:text="Action B"
+            android:textSize="12dip" />
+
+    </LinearLayout>
 </LinearLayout>

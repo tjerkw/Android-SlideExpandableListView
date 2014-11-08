@@ -25,6 +25,10 @@ public class SlideExpandableListAdapter extends AbstractSlideExpandableListAdapt
 		this(wrapped, R.id.expandable_toggle_button, R.id.expandable);
 	}
 
+    public void setExpandableSlideListener(SlideExpandableListener anSlideExpandableListener) {
+        slideListener = anSlideExpandableListener;
+    }
+
 	@Override
 	public View getExpandToggleButton(View parent) {
 		return parent.findViewById(toggle_button_id);
