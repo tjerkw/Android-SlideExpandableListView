@@ -61,6 +61,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	*/
 	private ViewGroup parent;
 
+	private boolean accordionMode;
+
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
 	}
@@ -199,6 +201,14 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		return (lastOpenPosition != -1) ? true : false;
 	}
 
+	public void setAccordionMode(final boolean accordionMode) {
+		this.accordionMode = accordionMode;
+	}
+
+	public boolean isAccordionMode() {
+		return accordionMode;
+	}
+
 	public void enableFor(View parent, int position) {
 		View more = getExpandToggleButton(parent);
 		View itemToolbar = getExpandableView(parent);
@@ -206,6 +216,10 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 		enableFor(more, itemToolbar, position);
 		itemToolbar.requestLayout();
+
+		if(accordionMode && position == 0) {
+			more.performClick();
+		}
 	}
 
 
@@ -254,37 +268,45 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 
 					target.setAnimation(null);
 
-					int type = target.getVisibility() == View.VISIBLE
-							? ExpandCollapseAnimation.COLLAPSE
-							: ExpandCollapseAnimation.EXPAND;
-
-					// remember the state
-					if (type == ExpandCollapseAnimation.EXPAND) {
-						openItems.set(position, true);
-					} else {
-						openItems.set(position, false);
+					if((accordionMode && target.getVisibility() != View.VISIBLE) || !accordionMode) {
+						toggleView(
+								target.getVisibility() == View.VISIBLE
+									? ExpandCollapseAnimation.COLLAPSE
+									: ExpandCollapseAnimation.EXPAND,
+								position,
+								target
+						);
 					}
-					// check if we need to collapse a different view
-					if (type == ExpandCollapseAnimation.EXPAND) {
-						if (lastOpenPosition != -1 && lastOpenPosition != position) {
-							if (lastOpen != null) {
-								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
-								notifiyExpandCollapseListener(
-										ExpandCollapseAnimation.COLLAPSE,
-										lastOpen, lastOpenPosition);
-							}
-							openItems.set(lastOpenPosition, false);
-						}
-						lastOpen = target;
-						lastOpenPosition = position;
-					} else if (lastOpenPosition == position) {
-						lastOpenPosition = -1;
-					}
-					animateView(target, type);
-					notifiyExpandCollapseListener(type, target, position);
 				}
 			}
 		});
+	}
+
+	private void toggleView(int type, int position, View target) {
+		// remember the state
+		if (type == ExpandCollapseAnimation.EXPAND) {
+			openItems.set(position, true);
+		} else {
+			openItems.set(position, false);
+		}
+		// check if we need to collapse a different view
+		if (type == ExpandCollapseAnimation.EXPAND) {
+			if (lastOpenPosition != -1 && lastOpenPosition != position) {
+				if (lastOpen != null) {
+					animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+					notifiyExpandCollapseListener(
+							ExpandCollapseAnimation.COLLAPSE,
+							lastOpen, lastOpenPosition);
+				}
+				openItems.set(lastOpenPosition, false);
+			}
+			lastOpen = target;
+			lastOpenPosition = position;
+		} else if (lastOpenPosition == position) {
+			lastOpenPosition = -1;
+		}
+		animateView(target, type);
+		notifiyExpandCollapseListener(type, target, position);
 	}
 
 	private void updateExpandable(View target, int position) {
