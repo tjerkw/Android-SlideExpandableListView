@@ -61,8 +61,18 @@ class SlideExpandableListView extends ListView {
 		this.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				SlideExpandableListAdapter adapter = (SlideExpandableListAdapter)getAdapter();
-				adapter.getExpandToggleButton(view).performClick();
+				ListAdapter listAdapter = getAdapter();
+				//modified by xiayong ,exist a bug when addHeader or footerView 
+				
+				//listAdapter might be HeaderViewListAdapter when we called addHeaderView() or addFooterView()
+				//reason:see the source file of List.setAdapter();
+				if(listAdapter instanceof HeaderViewListAdapter){
+					listAdapter = ((HeaderViewListAdapter)listAdapter).getWrappedAdapter();
+				}
+				if(listAdapter instanceof SlideExpandableListAdapter){
+					SlideExpandableListAdapter adapter = (SlideExpandableListAdapter)listAdapter;
+					adapter.getExpandToggleButton(view).performClick();
+				}
 			}
 		});
 	}
