@@ -83,6 +83,8 @@ class SlideExpandableListView extends ListView {
 		AbstractSlideExpandableListAdapter.SavedState ss = (AbstractSlideExpandableListAdapter.SavedState)state;
 		super.onRestoreInstanceState(ss.getSuperState());
 
-		adapter.onRestoreInstanceState(ss);
+        if (adapter != null) {
+            adapter.onRestoreInstanceState(ss);
+        }
 	}
 }
