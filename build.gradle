@@ -15,7 +15,7 @@ allprojects {
 
 ext {
     compileSdkVersion = 22
-    buildToolsVersion = "23.0.0-rc2"
+    buildToolsVersion = "23.0.0-rc3"
 
     compatibility_JavaVersion = JavaVersion.VERSION_1_7
 }
