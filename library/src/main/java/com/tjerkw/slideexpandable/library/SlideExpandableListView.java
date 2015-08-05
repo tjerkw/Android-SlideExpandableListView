@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.content.Context;
+import android.widget.WrapperListAdapter;
 
 /**
  * Simple subclass of listview which does nothing more than wrap
@@ -61,8 +62,9 @@ class SlideExpandableListView extends ListView {
 		this.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-				SlideExpandableListAdapter adapter = (SlideExpandableListAdapter)getAdapter();
-				adapter.getExpandToggleButton(view).performClick();
+				if (adapter != null) {
+					adapter.getExpandToggleButton(view).performClick();
+				}
 			}
 		});
 	}
