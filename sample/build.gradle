@@ -7,7 +7,7 @@ buildscript {
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'android'
 
 dependencies {
     compile project(':library')
