@@ -21,11 +21,9 @@ import android.widget.WrapperListAdapter;
  */
 public abstract class WrapperListAdapterImpl extends BaseAdapter implements WrapperListAdapter {
 	protected final ListAdapter wrapped;
-	private final boolean isBaseAdapter;
 
 	public WrapperListAdapterImpl(ListAdapter wrapped) {
 		this.wrapped = wrapped;
-		this.isBaseAdapter = BaseAdapter.class.isAssignableFrom(wrapped.getClass());
 	}
 
 	@Override
@@ -95,14 +93,14 @@ public abstract class WrapperListAdapterImpl extends BaseAdapter implements Wrap
 
 	@Override
 	public void notifyDataSetChanged() {
-		if ( isBaseAdapter ){
+		if (wrapped instanceof BaseAdapter) {
 			((BaseAdapter)wrapped).notifyDataSetChanged();
 		}
 	}
 	
 	@Override
 	public void notifyDataSetInvalidated() {
-		if ( isBaseAdapter ){
+		if (wrapped instanceof BaseAdapter) {
 			((BaseAdapter)wrapped).notifyDataSetInvalidated();
 		}
 	}
