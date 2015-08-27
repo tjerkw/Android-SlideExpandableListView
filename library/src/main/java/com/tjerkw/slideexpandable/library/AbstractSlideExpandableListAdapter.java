@@ -1,7 +1,7 @@
 package com.tjerkw.slideexpandable.library;
 
 import java.util.BitSet;
-import android.graphics.Rect;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseIntArray;
@@ -322,30 +322,49 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				if (type == ExpandCollapseAnimation.EXPAND) {
-					if (parent instanceof ListView) {
-						ListView listView = (ListView) parent;
-						int movement = target.getBottom();
-
-						Rect r = new Rect();
-						boolean visible = target.getGlobalVisibleRect(r);
-						Rect r2 = new Rect();
-						listView.getGlobalVisibleRect(r2);
-						
-						if (!visible) {
-							listView.smoothScrollBy(movement, getAnimationDuration());
-						} else {
-							if (r2.bottom == r.bottom) {
-								listView.smoothScrollBy(movement, getAnimationDuration());
-							}
-						}
-					}
+					animateScrollToOpenPosition();
 				}
-
 			}
+			
 		});
 		target.startAnimation(anim);
 	}
 
+	/**
+	 * Animate the list view scrolling in order to display the currently opened
+	 * item at the top, if needed. On API < 11 it's not animated, but immediate.
+	 */
+	private void animateScrollToOpenPosition() {
+		if (lastOpenPosition >= 0) {
+			if (parent instanceof ListView) {
+				final ListView listView = (ListView) parent;
+
+				// Get the view associated with the currently opened item 
+				final View item = listView.getChildAt(lastOpenPosition - listView.getFirstVisiblePosition());
+				if (item == null) return;
+				
+				// Get opened item y bounds
+				int top = item.getTop() - listView.getPaddingTop();
+				int bottom = top + item.getHeight();
+				
+				// CASE 1: Item is fully visible
+				final int listViewHeight = listView.getHeight();
+				if (top >= 0 && bottom <= listViewHeight) {
+					// Do nothing, it's ok as it is
+				
+				// CASE 2: Item is bigger than the list
+				// CASE 3: Top bound is out of view
+				} else if (bottom - top > listViewHeight || top < 0) {
+					listView.smoothScrollBy(top, getAnimationDuration()); // Position the item at top
+					
+				// CASE 4: Bottom bound is out of view 
+				} else if (bottom > listViewHeight) {
+					listView.smoothScrollBy(bottom - listViewHeight, getAnimationDuration());
+				}
+				
+			}
+		}
+	}
 
 	/**
 	 * Closes the current open item.
