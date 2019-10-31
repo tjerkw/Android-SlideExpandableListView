@@ -2,7 +2,7 @@
 
 ![Screenshot](https://github.com/tjerkw/Android-SlideExpandableListView/raw/master/raw/example-screens.png)
 
-Not happy with the Android ExpandableListView android offers? Want something like the Spotify app. This library allows you to have custom listview in wich each list item has an area that will slide-out once the users clicks on a certain button.
+Not happy with the Android ExpandableListView android offers? Want something like the Spotify app. This library allows you to have custom listview in which each list item has an area that will slide-out once the users clicks on a certain button.
 
 ## Features
 
